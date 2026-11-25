@@ -9,4 +9,5 @@ Nothing is published yet.
 Rules for adding a server are in `AGENTS.md`.
 
 <!-- GENERATED:BEGIN -->
+_Nothing yet._
 <!-- GENERATED:END -->

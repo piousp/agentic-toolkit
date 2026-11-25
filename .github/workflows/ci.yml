@@ -18,5 +18,11 @@ jobs:
         run: python3 scripts/check_repo.py
       - name: Generated index
         run: python3 scripts/gen_index.py --check
+      - name: Changelog format
+        run: python3 scripts/check_changelog.py
+      - name: Relative links
+        run: python3 scripts/check_links.py
+      - name: Prompt mirror
+        run: python3 scripts/check_mirror.py
       - name: Checks have tests
         run: tests/run_tests.sh

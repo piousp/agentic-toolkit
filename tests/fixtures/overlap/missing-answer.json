@@ -1,0 +1,12 @@
+{
+  "answers": {
+    "overlap_skill_demo_b": {
+      "type": "choice",
+      "probabilities": {
+        "none": 0.9,
+        "partial": 0.08,
+        "high": 0.02
+      }
+    }
+  }
+}

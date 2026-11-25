@@ -1,6 +1,6 @@
 ---
 name: demo-agent
-description: Minimal agent used by the repository checks. Load it only in tests.
+description: Minimal agent used by the repository checks; it depends on demo-skill. Load it only in tests.
 tools: read, grep
 skills: demo-skill
 systemPromptMode: append

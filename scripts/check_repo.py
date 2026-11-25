@@ -17,7 +17,6 @@ from pathlib import Path
 CATEGORY_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 FIELD_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*):(.*)$")
 SKILL_REF_RE = re.compile(r"skill:([a-z0-9][a-z0-9-]*)")
-SKILL_LINK_RE = re.compile(r"\]\(([^)\s]+?/SKILL\.md)\)")
 BLOCK_MARKERS = {">", "|", ">-", "|-", ">+", "|+"}
 MIN_DESCRIPTION = 20
 
@@ -122,7 +121,7 @@ def validate(kind, paths, root, skill_names):
 
 
 def validate_references(kind, paths, root, skill_names):
-    """Check the two reference forms: `skill:<name>` and links to a SKILL.md."""
+    """Check the declared reference form: `skill:<name>`."""
     errors = []
     for path in paths:
         label = f"{kind} {path.relative_to(root)}"
@@ -133,10 +132,6 @@ def validate_references(kind, paths, root, skill_names):
                 errors.append(
                     f"{label}: references skill:{name}, which this repository does not publish"
                 )
-        for match in SKILL_LINK_RE.finditer(text):
-            target = (path.parent / match.group(1)).resolve()
-            if not target.is_file():
-                errors.append(f"{label}: link to a missing file: {match.group(1)}")
     return errors
 
 

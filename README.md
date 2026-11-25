@@ -58,11 +58,23 @@ Categories are created on first use and never reserved up front. The category is
 
 ## Portability rules
 
-Three checks run in CI on every push:
+Six checks run in CI on every push:
 
 - `scripts/check_portability.sh` fails on absolute paths, network addresses, hardware identifiers, email addresses, credentials and machine-specific provider or model ids. Test fixtures are excluded by design.
-- `scripts/check_repo.py` fails on missing or inconsistent frontmatter, duplicate names, a category that disagrees with the directory, or an agent that requires a skill this repository does not publish.
+- `scripts/check_repo.py` fails on missing or inconsistent frontmatter, duplicate names, a category directory whose name is not kebab-case, or an agent that requires a skill this repository does not publish.
 - `scripts/gen_index.py --check` fails when the generated tables no longer match the files on disk.
+- `scripts/check_changelog.py` fails when `CHANGELOG.md` breaks a date block, the order of its sections, or the one-line, path-first shape of an entry.
+- `scripts/check_links.py` fails when a relative link or image in a Markdown file points at nothing.
+- `scripts/check_mirror.py` fails when the two prompt files stop matching section by section.
+
+A seventh check runs locally, when an artifact is about to join the catalog, because it needs a model that belongs to an account:
+
+```sh
+TOOLKIT_JUDGE_BASE_URL=... TOOLKIT_JUDGE_MODEL=... TOOLKIT_JUDGE_API_KEY=... \
+  scripts/check_overlap.py skills/<category>/<name>/SKILL.md
+```
+
+It asks the configured decision model whether the candidate covers the work of an artifact already published, of any kind, and fails on a high overlap. No provider, model id or key is committed: without the three variables it stops with exit 2 instead of passing silently.
 
 Documentation, code comments and commit messages are in English.
 

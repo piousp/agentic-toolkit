@@ -36,7 +36,7 @@ The tables at the end of the index files are produced by `scripts/gen_index.py`.
 
 - One block per date, headed `## YYYY-MM-DD`, newest first. A change joins that date's block; do not open an empty block.
 - Allowed sections, in this order: `### Added`, `### Changed`, `### Fixed`, `### Removed`. Keep a section only when it has an entry.
-- One line per change, path first: `scripts/gen_index.py` skips prose markers. A second sentence means a second entry.
+- One line per change, path first: the paths in backticks, a colon, then the description. `scripts/check_changelog.py` enforces the shape; a second sentence means a second entry.
 - The entry lands in the same commit as the change it describes.
 
 ## Portability rules
@@ -49,8 +49,13 @@ Forbidden in every committed file: absolute paths, IP addresses, subnets, MAC ad
 python3 scripts/check_repo.py
 scripts/check_portability.sh
 python3 scripts/gen_index.py --check
+python3 scripts/check_changelog.py
+python3 scripts/check_links.py
+python3 scripts/check_mirror.py
 tests/run_tests.sh
 ```
+
+One check stays out of that list as it stays out of CI: `scripts/check_overlap.py` needs a decision model that belongs to an account, configured with `TOOLKIT_JUDGE_BASE_URL`, `TOOLKIT_JUDGE_MODEL` and `TOOLKIT_JUDGE_API_KEY`. Run it on the artifact being added, before it joins the catalog; without the three variables it exits 2, never 0.
 
 ## Index
 

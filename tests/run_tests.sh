@@ -50,18 +50,27 @@ else
 fi
 rm -rf "$tmp"
 
-# The two prompts are mirrors: same section and rule counts.
-en_sections=$(grep -c '^## ' harness/PROMPT.md)
-es_sections=$(grep -c '^## ' harness/PROMPT.es.md)
-en_rules=$(grep -c '^- ' harness/PROMPT.md)
-es_rules=$(grep -c '^- ' harness/PROMPT.es.md)
-if [ "$en_sections" = "$es_sections" ] && [ "$en_rules" = "$es_rules" ]; then
-  echo "ok   prompts mirror each other ($en_sections sections, $en_rules rules)"
-  passed=$((passed + 1))
-else
-  echo "FAIL prompts drifted: en $en_sections/$en_rules, es $es_sections/$es_rules"
-  failed=$((failed + 1))
-fi
+expect "check_changelog accepts a valid changelog" 0 python3 scripts/check_changelog.py --root "$FIX/changelog/valid"
+for case in "$FIX"/changelog/invalid/*/; do
+  expect "check_changelog rejects $(basename "$case")" 1 python3 scripts/check_changelog.py --root "$case"
+done
+expect "check_changelog accepts this repository" 0 python3 scripts/check_changelog.py
+
+expect "check_links accepts resolvable links" 0 python3 scripts/check_links.py --root "$FIX/links/valid"
+expect "check_links rejects a dangling link" 1 python3 scripts/check_links.py --root "$FIX/links/invalid"
+expect "check_links accepts this repository" 0 python3 scripts/check_links.py
+
+expect "check_mirror accepts two mirrored prompts" 0 python3 scripts/check_mirror.py --en "$FIX/mirror/valid/PROMPT.md" --es "$FIX/mirror/valid/PROMPT.es.md"
+expect "check_mirror rejects a drifted pair" 1 python3 scripts/check_mirror.py --en "$FIX/mirror/invalid/PROMPT.md" --es "$FIX/mirror/invalid/PROMPT.es.md"
+expect "check_mirror accepts this repository" 0 python3 scripts/check_mirror.py
+
+expect "check_overlap reports a high overlap" 1 python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --response-file "$FIX/overlap/high.json" skills/demo/demo-a/SKILL.md
+expect "check_overlap accepts distinct artifacts" 0 python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --response-file "$FIX/overlap/none.json" skills/demo/demo-a/SKILL.md
+expect "check_overlap reads an exact tie as high" 1 python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --response-file "$FIX/overlap/tie.json" skills/demo/demo-a/SKILL.md
+expect "check_overlap rejects an incomplete response" 2 python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --response-file "$FIX/overlap/missing-answer.json" skills/demo/demo-a/SKILL.md
+expect "check_overlap rejects non-numeric probabilities" 2 python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --response-file "$FIX/overlap/bad-probability.json" skills/demo/demo-a/SKILL.md
+expect "check_overlap names missing configuration" 2 env -u TOOLKIT_JUDGE_BASE_URL -u TOOLKIT_JUDGE_MODEL -u TOOLKIT_JUDGE_API_KEY python3 scripts/check_overlap.py --root "$FIX/overlap/tree" skills/demo/demo-a/SKILL.md
+expect "check_overlap rejects a path that is not an artifact" 2 python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --response-file "$FIX/overlap/high.json" README.md
 
 expect "check_repo rejects a dangling skill reference" 1 python3 scripts/check_repo.py --root "$FIX/refs-bad"
 

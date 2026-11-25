@@ -34,7 +34,7 @@ Harness fields follow the reference harness and are documented in the artifact w
 
 An agent may declare `skills:`, and only skills published here. `scripts/check_repo.py` fails otherwise.
 
-A skill that needs another one says so with `skill:<name>`, or with a relative link ending in `SKILL.md`; the same check fails when the target is missing. Prose mentions of agents inside skills are not checked yet: the agent name has to exist for the reference to work, but nothing enforces it.
+A skill that needs another one says so with `skill:<name>`, or with a relative link ending in `SKILL.md`. `scripts/check_repo.py` fails on the first form and `scripts/check_links.py` on the second when the target is missing. Prose mentions of agents inside skills are not checked yet: the agent name has to exist for the reference to work, but nothing enforces it.
 
 Self-containment is the default. A skill that depends on another one is installable alone only if the dependency is installed too, and that is stated in its description.
 
@@ -100,9 +100,15 @@ Tables between `<!-- GENERATED:BEGIN -->` and `<!-- GENERATED:END -->` come from
 | Check | Fails when |
 |---|---|
 | `scripts/check_portability.sh` | a forbidden value appears in a tracked file |
-| `scripts/check_repo.py` | frontmatter is missing or inconsistent, names collide, a category disagrees with the directory, or a declared skill does not exist |
+| `scripts/check_repo.py` | frontmatter is missing or inconsistent, names collide, a category directory is not kebab-case, or a declared skill does not exist |
 | `scripts/gen_index.py --check` | the generated tables disagree with the tree |
+| `scripts/check_changelog.py` | a date block is missing, out of order or empty, a section is not one of the four, or an entry is split over two lines or does not start with its paths |
+| `scripts/check_links.py` | a relative link or image in a Markdown file does not resolve |
+| `scripts/check_mirror.py` | the two prompt files disagree on a section, a rule count or an `[ALWAYS]`/`[NEVER]` count |
 | `tests/run_tests.sh` | a check stops failing on the violation it is meant to catch |
+| `scripts/check_overlap.py` | the candidate covers the work of an artifact already published, of any kind |
+
+Every check in that table runs in CI except the last one: it calls a model that belongs to an account, so it runs locally, on the artifact being added. It reads the base URL, the model id and the key from `TOOLKIT_JUDGE_BASE_URL`, `TOOLKIT_JUDGE_MODEL` and `TOOLKIT_JUDGE_API_KEY`, and exits 2 when one is missing: a check that cannot run never reports success. The catalog and the candidate travel together in the request state, and the candidate's declared `skills:` go with them so that a dependency is not read as an overlap. The verdict is the most likely answer over the `none`, `partial` and `high` criteria; a tie counts as `high`. Saved responses in `tests/fixtures/overlap/` cover every branch without a network call.
 
 ## Decision log
 
@@ -123,3 +129,6 @@ Tables between `<!-- GENERATED:BEGIN -->` and `<!-- GENERATED:END -->` come from
 | Category of a skill about skills | `general`, not `agent-authoring`: it applies to any task that produces a skill, and a category is navigation, not a claim about the subject |
 | Renaming during migration | `pablo-code-philosophy` becomes `pablo-coding-style`: skills cite each other by name, and the old name no longer describes the content (style plus the principles behind it), so the rename happens once, in the migration that publishes the artifact |
 | Self-contained artifacts | An artifact published here names no other skill or agent in its description, body or references, not even one this repository publishes; a name the reader may not have installed routes to nothing, and the rule reads the same without it. A dependency that must exist is declared per the Dependencies section instead |
+| Changelog rules as a check | The changelog rules were prose nobody enforced; `scripts/check_changelog.py` runs them, path-first entries included, so the seven entries that broke the shape were rewritten once rather than left as a rule with no control |
+| Link checking scope | One repository-wide check replaces the artifact-scoped `SKILL.md` link rule: the question is whether a file exists, and it does not change with the kind of artifact that points at it |
+| Overlap check | Runs locally, before an artifact joins the catalog, on a decision model configured from the environment. CI stays offline and credential-free, and the repository commits no provider or model id; an overlap verdict is a judgement, so it needs a human to act on it |

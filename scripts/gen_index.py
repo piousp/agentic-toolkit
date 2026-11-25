@@ -25,7 +25,7 @@ from check_repo import parse_frontmatter  # noqa: E402
 
 
 def collect(root):
-    entries = {"skill": [], "agent": []}
+    entries = {"skill": [], "agent": [], "mcp": []}
     for kind, pattern in (("skill", "skills/*/*/SKILL.md"), ("agent", "agents/*/*/AGENT.md")):
         for path in sorted(root.glob(pattern)):
             fields, _ = parse_frontmatter(path.read_text(encoding="utf-8"))
@@ -37,6 +37,10 @@ def collect(root):
                     "description": clean(fields.get("description", "")),
                 }
             )
+    # MCP servers carry no frontmatter: the directory name is the identity and
+    # the index only lists them, so no description is read.
+    for path in sorted(root.glob("mcps/*/README.md")):
+        entries["mcp"].append({"name": path.parent.name})
     return entries
 
 
@@ -58,7 +62,9 @@ def table(headers, rows):
 
 
 def render_overview(entries):
-    categories = sorted({e["category"] for group in entries.values() for e in group})
+    categories = sorted(
+        {e["category"] for kind in ("skill", "agent") for e in entries[kind]}
+    )
     rows = []
     for category in categories:
         skills = sum(1 for e in entries["skill"] if e["category"] == category)
@@ -94,11 +100,20 @@ def render_tree(entries):
     return "\n".join(lines) + "\n"
 
 
+def render_mcp_tree(entries):
+    lines = [f"- `mcps/{entry['name']}/README.md`" for entry in entries["mcp"]]
+    if not lines:
+        return "_Nothing yet._\n"
+    return "\n".join(lines) + "\n"
+
+
 TARGETS = {
     "README.md": render_overview,
     "AGENTS.md": render_tree,
     "skills/README.md": render_skills,
     "agents/README.md": render_agents,
+    "mcps/README.md": render_mcp_tree,
+    "mcps/AGENTS.md": render_mcp_tree,
 }
 
 
