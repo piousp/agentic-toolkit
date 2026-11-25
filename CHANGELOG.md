@@ -74,6 +74,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `skills/writing/pablo-humanize-text/references/banned-list-en.md`: future-narrative closers and narrated candor join the closers table.
 - `skills/writing/pablo-humanize-text/SKILL.md`, `skills/writing/pablo-humanize-text/SKILL.es.md`: the Spanish mirror moves beside the skill, and the working-language line points at it.
 - `AGENTS.md`, `skills/AGENTS.md`, `docs/conventions.md`: a skill may ship a Spanish mirror, and the rules state that the pair changes in the same edit.
+- `skills/writing/pablo-humanize-text/references/banned-list-en.md`: the function-word note keeps its warning and drops a pointer to an appendix no reader can open.
 
 ### Fixed
 

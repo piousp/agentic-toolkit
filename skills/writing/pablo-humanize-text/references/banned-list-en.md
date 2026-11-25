@@ -61,12 +61,11 @@ maybe
 
 Stacked hedges are worse than single ones. One hedge per claim, or none.
 
-## Function words from the source list
+## Function words
 
-The original appendix also lists can, may, could, that, it. These are
-ordinary function words. [NEVER] treat them as banned words. [DO] cut
-their filler uses, as in "the fact that" or "it is important to note
-that".
+Words such as can, may, could, that and it are ordinary function words.
+[NEVER] treat them as banned words. [DO] cut their filler uses, as in
+"the fact that" or "it is important to note that".
 
 ## How to fix
 
