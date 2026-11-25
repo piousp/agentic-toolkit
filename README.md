@@ -51,9 +51,9 @@ Categories are created on first use and never reserved up front. The category is
 | Category | Agents | Skills |
 |---|---|---|
 | `coding` | 0 | 1 |
-| `general` | 0 | 2 |
+| `general` | 1 | 2 |
 | `pi-tooling` | 0 | 1 |
-| `research` | 1 | 0 |
+| `research` | 2 | 0 |
 <!-- GENERATED:END -->
 
 ## Portability rules

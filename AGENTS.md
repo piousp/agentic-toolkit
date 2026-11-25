@@ -62,7 +62,9 @@ tests/run_tests.sh
 ## Index
 
 <!-- GENERATED:BEGIN -->
+- `agents/general/analyst/AGENT.md`
 - `agents/research/scout/AGENT.md`
+- `agents/research/web-scout/AGENT.md`
 - `skills/coding/pablo-coding-style/SKILL.md`
 - `skills/general/pablo-goal-discovery/SKILL.md`
 - `skills/general/writing-agent-skills/SKILL.md`

@@ -35,6 +35,9 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `tests/fixtures/overlap/added.json`: saved response for the artifact a commit adds.
 - `tests/fixtures/overlap/with-cost.json`: saved response with the usage, cost and energy blocks.
 - `scripts/pre_push.sh`: the six offline checks in one command, for a local pre-push hook.
+- `agents/research/web-scout/AGENT.md`: the web recon agent, with its two-query budget, failure JSON and lens mode.
+- `agents/general/analyst/AGENT.md`: the analysis agent, with its evidence labels, severity scale and lens mode.
+- `agents/general/README.md`: category readme for agents usable in any task.
 
 ### Changed
 
@@ -59,6 +62,8 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `tests/run_tests.sh`: cases for the artifact selection, including a throwaway git tree.
 - `README.md`, `AGENTS.md`, `docs/conventions.md`: the overlap check runs in CI, and the pre-push hook is documented.
 - `skills/general/pablo-goal-discovery/SKILL.md`: hyphens used as a pause become colons, semicolons and parentheses, in the prose and in the two format templates.
+- `agents/research/README.md`: analysis leaves the category description, since the agent that does it lives in `general`.
+- `docs/conventions.md`: an agent may name another agent once, in parentheses, as a routing hint.
 
 ### Fixed
 
