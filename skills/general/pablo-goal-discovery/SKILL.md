@@ -49,9 +49,9 @@ write its artifacts.
   do and which artifacts it will write after confirmation (`goal.md` + the
   first `decisions.md` entry).
 
-## Step 0 - quick scan (pre-round)
+## Step 0: quick scan (pre-round)
 
-Before the first round, a fast context scan only - no spec or full
+Before the first round, a fast context scan only; no spec or full
 investigation. Read any project-level index and open the obvious files the
 ask names, including code files. Identify what makes the ask weak:
 
@@ -72,8 +72,8 @@ already settled. [ALWAYS] ask the whole frontier in one round: numbered
 questions, a recommended answer for each, then wait. [NEVER] ask one question
 at a time, [NEVER] ask a question whose prerequisite is unsettled.
 
-**Frontier filtering (ask vs. assume).** Only decisions that change scope -
-what gets built, which system/files are touched, what success means - enter
+**Frontier filtering (ask vs. assume).** Only decisions that change scope
+(what gets built, which system/files are touched, what success means) enter
 the round. If the ask does not define success, [ALWAYS] ask what success
 means in the first round. Low-impact decisions (naming, format, defaults,
 ordering) are assumed and flagged as explicit assumptions in `goal.md`.
@@ -90,16 +90,16 @@ ask open-ended questions without one.
 Ask the whole frontier in one round, as Markdown headings:
 
 ```markdown
-### 🧭 Round 1 - frontier
+### 🧭 Round 1: frontier
 
-#### ❓ Q1 - Content scope
+#### ❓ Q1: Content scope
 
 - 🔹 **Option A:** harness artifacts only.
 - 🔹 **Option B:** A plus extensions and themes.
 - ✅ **Recommendation:** A, because the npm packages have their own cycle.
 - 💡 **Fact:** agent discovery reads one directory level only.
 
-#### ❓ Q2 - Relation to the previous repository
+#### ❓ Q2: Relation to the previous repository
 
 - 🔹 **Option A:** new repository built from a curated copy.
 - ✅ **Recommendation:** A, conditional on a history audit.
@@ -162,7 +162,7 @@ Write `<session-dir>/decisions.md` with this structure:
 
 ```markdown
 # Decisions
-## <YYYY-MM-DD> - <goal>
+## <YYYY-MM-DD>: <goal>
 - D1: <decision>; rejected: <alternative>; reason: <short reason>
 ```
 
