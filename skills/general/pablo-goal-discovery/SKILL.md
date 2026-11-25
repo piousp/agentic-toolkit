@@ -85,13 +85,36 @@ and propose closing the remainder with recommendations flagged as assumptions.
 the user should be able to answer "recommended" for the whole round. [NEVER]
 ask open-ended questions without one.
 
-## Text markers
+## Round format
 
-KISS, plain text; use emoji markers only in round text. 🧭 `Round N -
-frontier:` opens each round; close the last with `Frontier: empty`. ❓
-`Q<N> - <title>:` numbers questions continuously across rounds. Use 🔹
-`Option<N>: <text>`, ✅ `Recommendation: <text>`, and 💡 `Fact: <text>`
-for options, recommendations, and scout/web-scout facts respectively.
+Ask the whole frontier in one round, as Markdown headings:
+
+```markdown
+### 🧭 Round 1 - frontier
+
+#### ❓ Q1 - Alcance del contenido
+
+- 🔹 **Option A:** sólo artefactos de harness.
+- 🔹 **Option B:** A más extensiones y temas.
+- ✅ **Recommendation:** A, porque los paquetes npm tienen su propio ciclo.
+- 💡 **Fact:** el descubrimiento de agentes es de un solo nivel.
+
+#### ❓ Q2 - Relación con el repo anterior
+
+- 🔹 **Option A:** repo nuevo por copia curada.
+- ✅ **Recommendation:** A, condicionada a una auditoría de historial.
+```
+
+- [ALWAYS] one `####` heading per question, numbered `Q<N>` continuously
+  across rounds.
+- [ALWAYS] keep options, recommendation and facts inside the question they
+  belong to. A fact that answers a file or environment question goes there,
+  marked 💡, with its source.
+- [ALWAYS] write the recommendation in bold, on its own line; [NEVER] bury it
+  at the end of an option.
+- [NEVER] use a heading level deeper than `####`: it stops reading as a
+  heading in the terminal.
+- Close the last round with the line `🧭 Frontier: empty`.
 
 ## Fact lookups via subagent
 
@@ -103,7 +126,7 @@ downstream questions wait; the rest proceed. Non-blocking by design.
 
 ## Exit criteria
 
-- When the frontier is empty, close the last round with `Frontier: empty`,
+- When the frontier is empty, close the last round with `🧭 Frontier: empty`,
   present the synthesis, and wait for explicit user confirmation.
 - On rejection, add the correction to the frontier and resume rounds.
   [NEVER] write artifacts before confirmation.
