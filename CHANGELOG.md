@@ -1,36 +1,33 @@
 # Changelog
 
-All notable changes to this repository are recorded here. The format follows Keep a Changelog, and the project uses semantic versioning once artifacts start being consumed by name.
+Notable changes, newest first, one block per date. There are no releases: artifacts are consumed from a commit.
 
-## [Unreleased]
+## 2026-11-25
 
 ### Added
 
-- Repository scaffold: rules in `AGENTS.md`, human documentation in `README.md`, MIT license.
-- `docs/conventions.md`: naming, categories, frontmatter, dependency and portability rules.
-- `docs/roadmap.md`: planned phases, including the installer and the atelier workflow.
-- `scripts/check_portability.sh`, `scripts/check_repo.py`, `scripts/gen_index.py`: the three checks that run in CI.
-- `scripts/link_agents.sh`: development helper that flattens the category layout into a harness directory.
-- `tests/`: fixtures and a runner proving that each check fails when it should.
-- `skills/pi-tooling/find-pi-session/`: resolves the current pi session and its artifact directory, read-only unless `--create` is passed.
-- `skills/general/pablo-goal-discovery/`: the grilling interview that turns a vague ask into a confirmed goal; depends on `find-pi-session` for the artifact path.
-- Reference checking in `scripts/check_repo.py`: a `skill:<name>` mention or a link to a `SKILL.md` must resolve, or the check fails.
-- `.github/workflows/ci.yml`: runs every check on push and pull request.
-- `settings.example.json` and `mcp.example.json`: placeholders with no account-specific values.
-- First agent migrated: `agents/research/scout/AGENT.md`.
+- Repository scaffold: agent rules, README, MIT license.
+- `docs/conventions.md`: naming, categories, frontmatter, portability.
+- `docs/roadmap.md`: phases, installer, atelier workflow.
+- `scripts/check_repo.py`, `scripts/check_portability.sh`, `scripts/gen_index.py`: the three checks.
+- Reference checking in `check_repo.py`: a mention of a skill the repository does not publish fails the check.
+- `.github/workflows/ci.yml`: the checks run on push and on pull request.
+- `scripts/link_agents.sh`: links agents into a harness directory.
+- `tests/`: fixtures and a runner proving each check can fail.
+- `skills/pi-tooling/find-pi-session/`: finds the current pi session. Reads only, unless `--create` is passed.
+- `skills/general/pablo-goal-discovery/`: turns a vague ask into a confirmed goal. Uses `find-pi-session`.
+- `harness/PROMPT.md` and `harness/PROMPT.es.md`: the system prompt, English and Spanish.
+- `harness/README.md`: install mapping, the no-layering rule, what the prompt assumes.
+- `harness/settings.example.json` and `harness/mcp.example.json`: placeholders, no account values.
+- `agents/research/scout/AGENT.md`: first agent.
 
 ### Changed
 
-- Example configuration moved to `harness/`, together with the system instructions.
-- `harness/PROMPT.md` and `harness/PROMPT.es.md` rewritten in the agents' voice: the opening line declares the coordinator identity, each rule in the five rule sections carries a bold label, and `[ALWAYS]`/`[NEVER]` mark the absolute ones where the label is not already the prohibition. No rule removed.
-
-### Added in `harness/`
-
-- `PROMPT.md`: the author's working prompt, distilled for publication, English.
-- `PROMPT.es.md`: the same prompt in Spanish, section for section.
-- `README.md`: install mapping, the no-layering constraint, and what the prompt assumes.
+- Example configuration moved to `harness/`.
+- The prompt rewritten in the agents' voice: labelled rules, `[ALWAYS]` and `[NEVER]` on the absolute ones.
+- The toolkit now calls itself an opinionated collection, in `README.md`, `AGENTS.md` and the GitHub description.
 
 ### Fixed
 
-- The agent linking helper and the install instructions now use `PI_CODING_AGENT_DIR`, the variable the harness actually reads.
-- The index generator no longer mistakes a prose mention of the generated markers for the generated region.
+- The linking helper and the install instructions use `PI_CODING_AGENT_DIR`, the variable the harness reads.
+- The index generator no longer takes a prose mention of the markers for the generated region.
