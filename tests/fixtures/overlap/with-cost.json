@@ -1,0 +1,23 @@
+{
+  "answers": {
+    "overlap_agent_demo_agent": {
+      "type": "choice",
+      "probabilities": {"none": 0.9000, "partial": 0.0900, "high": 0.0100}
+    },
+    "overlap_skill_demo_b": {
+      "type": "choice",
+      "probabilities": {"none": 0.9400, "partial": 0.0500, "high": 0.0100}
+    }
+  },
+  "usage": {
+    "input_tokens": 312,
+    "output_tokens": 2
+  },
+  "cost": {
+    "currency": "USD",
+    "total": 0.00042
+  },
+  "energy": {
+    "watt_hours": 0.013
+  }
+}

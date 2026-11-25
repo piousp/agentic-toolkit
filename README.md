@@ -73,7 +73,7 @@ A seventh check needs a model that belongs to an account, so it takes its config
 scripts/check_overlap.py skills/<category>/<name>/SKILL.md
 ```
 
-It asks the configured decision model whether the candidate covers the work of an artifact already published, of any kind, and fails on a high overlap. `ci.yml` runs it as its own job on every push and pull request, over the artifacts that change adds; the repository stores the URL and the model as variables and the key as a secret. While the key is empty the job says so and judges nothing, and a pull request from a fork cannot run it at all, because repository secrets are not delivered there. Without the three values the check exits 2 instead of passing silently.
+It asks the configured decision model whether the candidate covers the work of an artifact already published, of any kind, and fails on a high overlap. `--all` audits the whole catalog, every artifact against every other one, one request per artifact; that is what a manual run of `ci.yml` does from the Actions tab. On a push or a pull request the same job judges only the artifacts that change adds. The repository stores the URL and the model as variables and the key as a secret. While the key is empty the job says so and judges nothing, and a pull request from a fork cannot run it at all, because repository secrets are not delivered there. Without the three values the check exits 2 instead of passing silently. The log carries the probabilities of every verdict and the usage, cost and energy blocks the endpoint returns.
 
 ### Pre-push hook
 

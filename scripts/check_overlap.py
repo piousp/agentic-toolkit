@@ -4,6 +4,7 @@
 Usage:
   scripts/check_overlap.py [--root PATH] [--response-file PATH] [--timeout SECONDS] <candidate>
   scripts/check_overlap.py [--root PATH] --added-since REF
+  scripts/check_overlap.py [--root PATH] --all
 
 The candidate is one of:
   skills/<category>/<name>/SKILL.md
@@ -21,9 +22,10 @@ question otherwise.
 
 `--added-since REF` asks git which artifacts the commit added since REF and
 judges each one against the rest; a push reports a ref of zeros for a branch
-with no previous commit, which resolves to the parent of HEAD. One saved
-response covers one candidate, so a test with several candidates passes a
-single path instead.
+with no previous commit, which resolves to the parent of HEAD. `--all` ignores
+git and judges every artifact against every other one: the audit of the state
+as it is, at the cost of one request per artifact. One saved response covers
+one candidate, so a test with several candidates passes a single path instead.
 
 Configuration, read only when no response file is given:
   TOOLKIT_JUDGE_BASE_URL    base URL of the judge endpoint
@@ -320,7 +322,19 @@ def read_answers(payload_text, ids):
         if question_id not in answers:
             raise EvaluationError(f"the response has no answer for {question_id}")
         values.append(probabilities(answers[question_id], question_id))
-    return values
+    return values, data
+
+
+def report_metadata(data):
+    """Print the extra blocks the endpoint returns, as it returns them.
+
+    The usage, cost and energy blocks carry fields this check does not read, so
+    they are printed whole instead of being picked apart by name.
+    """
+    for key in ("usage", "cost", "energy"):
+        block = data.get(key)
+        if isinstance(block, dict) and block:
+            print(f"check_overlap: {key} {json.dumps(block, sort_keys=True)}")
 
 
 def report(results):
@@ -422,9 +436,11 @@ def evaluate(root, candidate_path, args):
             return fail(str(error))
 
     try:
-        answers = read_answers(payload_text, ids)
+        answers, data = read_answers(payload_text, ids)
     except EvaluationError as error:
         return fail(str(error))
+
+    report_metadata(data)
 
     results = [
         (entry, values, verdict(values)) for entry, values in zip(existing, answers)
@@ -444,6 +460,11 @@ def main():
         help="evaluate every artifact the push added since REF",
     )
     parser.add_argument(
+        "--all",
+        action="store_true",
+        help="evaluate every artifact against every other one",
+    )
+    parser.add_argument(
         "--root", default=None, help="repository root (default: parent of this script)"
     )
     parser.add_argument(
@@ -458,11 +479,17 @@ def main():
     if not root.is_dir():
         return fail(f"not a directory: {args.root}")
 
-    if bool(args.candidate) == bool(args.added_since):
-        return fail("pass either a candidate path or --added-since REF")
+    chosen = sum([bool(args.candidate), bool(args.added_since), args.all])
+    if chosen != 1:
+        return fail("pass one of: a candidate path, --added-since REF, or --all")
 
     forms = ", ".join(ACCEPTED_FORMS)
-    if args.added_since:
+    if args.all:
+        candidates = [entry["path"] for entry in collect(root)]
+        if not candidates:
+            print("check_overlap: no artifact to audit")
+            return 0
+    elif args.added_since:
         try:
             candidates = added_candidates(root, args.added_since)
         except EvaluationError as error:
@@ -470,8 +497,6 @@ def main():
         if not candidates:
             print(f"check_overlap: nothing added since {args.added_since}")
             return 0
-        if args.response_file and len(candidates) > 1:
-            return fail("a saved response covers one candidate: pass a candidate path instead")
     else:
         candidate_path = Path(args.candidate)
         if not candidate_path.is_absolute():
@@ -482,6 +507,9 @@ def main():
         if artifact_shape(root, candidate_path) is None:
             return fail(f"not an artifact path: {args.candidate}; expected one of {forms}")
         candidates = [candidate_path]
+
+    if args.response_file and len(candidates) > 1:
+        return fail("a saved response covers one candidate: pass a candidate path instead")
 
     status = 0
     for candidate_path in candidates:

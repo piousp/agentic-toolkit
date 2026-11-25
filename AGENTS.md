@@ -55,7 +55,7 @@ python3 scripts/check_mirror.py
 tests/run_tests.sh
 ```
 
-`scripts/check_overlap.py` is not in that list because it needs a decision model that belongs to an account, configured with `TOOLKIT_JUDGE_BASE_URL`, `TOOLKIT_JUDGE_MODEL` and `TOOLKIT_JUDGE_API_KEY`. Run it on the artifact being added, before it joins the catalog; `--added-since REF` judges the artifacts a commit added, which is what CI runs on every push and pull request. Without the three values it exits 2, never 0.
+`scripts/check_overlap.py` is not in that list because it needs a decision model that belongs to an account, configured with `TOOLKIT_JUDGE_BASE_URL`, `TOOLKIT_JUDGE_MODEL` and `TOOLKIT_JUDGE_API_KEY`. Run it on the artifact being added, before it joins the catalog; `--added-since REF` judges the artifacts a commit added, and `--all` audits the whole catalog, every artifact against every other one. CI runs the first form on a push or a pull request and the second on a manual dispatch. Without the three values it exits 2, never 0.
 
 `scripts/pre_push.sh` runs the six offline checks above in one command and can be installed as the repository's pre-push hook; it leaves the overlap check out, and CI remains the authority.
 

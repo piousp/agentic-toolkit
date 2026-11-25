@@ -33,6 +33,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `.github/workflows/ci.yml`: the changelog, link and mirror checks run on every push.
 - `.github/workflows/ci.yml`: the overlap check runs as its own job, over the artifacts a change adds.
 - `tests/fixtures/overlap/added.json`: saved response for the artifact a commit adds.
+- `tests/fixtures/overlap/with-cost.json`: saved response with the usage, cost and energy blocks.
 - `scripts/pre_push.sh`: the six offline checks in one command, for a local pre-push hook.
 
 ### Changed
@@ -48,6 +49,9 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `AGENTS.md`: the checks list names the new checks and the overlap step.
 - `README.md`: the checks list names the new checks.
 - `docs/conventions.md`: the checks table names the new checks, and the decision log records the overlap check.
+- `.github/workflows/ci.yml`: the overlap job can be dispatched by hand, and a manual run audits the whole catalog.
+- `scripts/check_overlap.py`: prints the usage, cost and energy blocks the endpoint returns, whole.
+- `scripts/check_overlap.py`: `--all` judges every artifact against every other one, the audit of the state as it is.
 - `tests/fixtures/valid/agents/general/demo-agent/AGENT.md`: the description names the skill it declares.
 - `CHANGELOG.md`: seven entries now start with their paths, as the rule asks.
 - `scripts/check_overlap.py`: each question names the artifact it asks about, because a decision model may ignore the question id.

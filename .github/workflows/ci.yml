@@ -3,6 +3,7 @@ name: checks
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   checks:
@@ -53,4 +54,9 @@ jobs:
           TOOLKIT_JUDGE_BASE_URL: ${{ vars.TOOLKIT_JUDGE_BASE_URL }}
           TOOLKIT_JUDGE_MODEL: ${{ vars.TOOLKIT_JUDGE_MODEL }}
           TOOLKIT_JUDGE_API_KEY: ${{ secrets.TOOLKIT_JUDGE_API_KEY }}
-        run: python3 scripts/check_overlap.py --added-since "${{ github.event.pull_request.base.sha || github.event.before }}"
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            python3 scripts/check_overlap.py --all
+          else
+            python3 scripts/check_overlap.py --added-since "${{ github.event.pull_request.base.sha || github.event.before }}"
+          fi

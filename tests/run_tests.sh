@@ -66,6 +66,15 @@ expect "check_mirror accepts this repository" 0 python3 scripts/check_mirror.py
 
 expect "check_overlap reports a high overlap" 1 python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --response-file "$FIX/overlap/high.json" skills/demo/demo-a/SKILL.md
 expect "check_overlap accepts distinct artifacts" 0 python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --response-file "$FIX/overlap/none.json" skills/demo/demo-a/SKILL.md
+
+out="$(python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --response-file "$FIX/overlap/with-cost.json" skills/demo/demo-a/SKILL.md)"
+if printf '%s\n' "$out" | grep -q '^check_overlap: cost '; then
+  echo "ok   check_overlap prints the cost block"
+  passed=$((passed + 1))
+else
+  echo "FAIL check_overlap did not print the cost block"
+  failed=$((failed + 1))
+fi
 expect "check_overlap reads an exact tie as high" 1 python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --response-file "$FIX/overlap/tie.json" skills/demo/demo-a/SKILL.md
 expect "check_overlap rejects an incomplete response" 2 python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --response-file "$FIX/overlap/missing-answer.json" skills/demo/demo-a/SKILL.md
 expect "check_overlap rejects non-numeric probabilities" 2 python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --response-file "$FIX/overlap/bad-probability.json" skills/demo/demo-a/SKILL.md
@@ -74,6 +83,8 @@ expect "check_overlap rejects a path that is not an artifact" 2 python3 scripts/
 
 expect "check_overlap rejects an unresolvable base" 2 python3 scripts/check_overlap.py --added-since nosuchref
 expect "check_overlap reports nothing added" 0 python3 scripts/check_overlap.py --added-since HEAD
+expect "check_overlap rejects two sources of candidates" 2 python3 scripts/check_overlap.py --all skills/general/writing-agent-skills/SKILL.md
+expect "check_overlap rejects a saved response for a full audit" 2 python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --all --response-file "$FIX/overlap/none.json"
 
 # --added-since takes the candidates from git: a commit that adds an artifact
 # is judged against the catalog of that tree.
