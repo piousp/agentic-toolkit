@@ -56,7 +56,7 @@ val names = customers
   .map(_.name.toUpperCase)
 ```
 
-Worth it here: three real steps (filter, filter, map); see [references/interactions.md](../interactions.md)'s `FP vs KISS` row before
+Worth it here: three real steps (filter, filter, map); see [interactions.md](../interactions.md)'s `FP vs KISS` row before
 reaching for a chain on a two-step transform.
 
 ### Typed failure for a multi-step expected outcome

@@ -84,5 +84,5 @@ See [`kiss.java.md`](../examples/kiss.java.md) and [`kiss.scala.md`](../examples
 - **DRY** → See [DRY.md](DRY.md). Covered by the `KISS vs DRY` row in the conflict matrix, [SKILL.md](../../SKILL.md), and by the KISS > DRY precedence in Principle Interactions.
 - **SOLID** → See [SOLID.md](SOLID.md). Covered by the `KISS vs SOLID` row in the conflict matrix, [SKILL.md](../../SKILL.md).
 - **GoF** → See [GoF.md](GoF.md). Covered by the `GoF vs KISS` row in the conflict matrix, [SKILL.md](../../SKILL.md).
-- **FP** → See [FP.md](FP.md). Covered by the `FP vs KISS` row in [references/interactions.md](../interactions.md).
-- **Unix philosophy** → See [UNX.md](UNX.md). Covered by the `UNIX vs KISS` row in [references/interactions.md](../interactions.md).
+- **FP** → See [FP.md](FP.md). Covered by the `FP vs KISS` row in [interactions.md](../interactions.md).
+- **Unix philosophy** → See [UNX.md](UNX.md). Covered by the `UNIX vs KISS` row in [interactions.md](../interactions.md).

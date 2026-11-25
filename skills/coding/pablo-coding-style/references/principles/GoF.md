@@ -47,8 +47,8 @@ See [`gof.java.md`](../examples/gof.java.md) and [`gof.scala.md`](../examples/go
 ## Related Principles
 - **KISS** → See [KISS.md](KISS.md). Covered by the `GoF vs KISS` row in the conflict matrix, [SKILL.md](../../SKILL.md).
 - **YAGNI** → See [YAGNI.md](YAGNI.md). Covered by the `GoF vs YAGNI` row in the conflict matrix, [SKILL.md](../../SKILL.md).
-- **DRY** → See [DRY.md](DRY.md). Covered by the `GoF vs DRY` row in [references/interactions.md](../interactions.md).
-- **SOLID** → See [SOLID.md](SOLID.md). Covered by the `GoF vs SOLID` row in [references/interactions.md](../interactions.md).
+- **DRY** → See [DRY.md](DRY.md). Covered by the `GoF vs DRY` row in [interactions.md](../interactions.md).
+- **SOLID** → See [SOLID.md](SOLID.md). Covered by the `GoF vs SOLID` row in [interactions.md](../interactions.md).
 - **FP** → See [FP.md](FP.md). Covered by the `GoF vs FP` row in the conflict matrix, [SKILL.md](../../SKILL.md).
-- **UNIX** → See [UNX.md](UNX.md). Covered by the `GoF vs UNIX` row in [references/interactions.md](../interactions.md).
+- **UNIX** → See [UNX.md](UNX.md). Covered by the `GoF vs UNIX` row in [interactions.md](../interactions.md).
 - **Mechanics**: for the curated 12-pattern catalog, per-language idioms, and worked examples, see [../gof/mechanics.md](../gof/mechanics.md).

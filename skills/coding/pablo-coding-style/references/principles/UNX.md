@@ -79,9 +79,9 @@ See [`unx.java.md`](../examples/unx.java.md) and [`unx.scala.md`](../examples/un
 
 ## Related Principles
 
-- **KISS** → See [KISS.md](KISS.md). Covered by the `UNIX vs KISS` row in [references/interactions.md](../interactions.md).
-- **DRY** → See [DRY.md](DRY.md). Covered by the `DRY vs UNIX` row in [references/interactions.md](../interactions.md).
-- **YAGNI** → See [YAGNI.md](YAGNI.md). Covered by the `UNIX vs YAGNI` row in [references/interactions.md](../interactions.md).
-- **SOLID** → See [SOLID.md](SOLID.md). Covered by the `UNIX vs SOLID` row in [references/interactions.md](../interactions.md).
-- **GoF** → See [GoF.md](GoF.md). Covered by the `GoF vs UNIX` row in [references/interactions.md](../interactions.md).
-- **FP** → See [FP.md](FP.md). Covered by the `FP vs UNIX` row in [references/interactions.md](../interactions.md).
+- **KISS** → See [KISS.md](KISS.md). Covered by the `UNIX vs KISS` row in [interactions.md](../interactions.md).
+- **DRY** → See [DRY.md](DRY.md). Covered by the `DRY vs UNIX` row in [interactions.md](../interactions.md).
+- **YAGNI** → See [YAGNI.md](YAGNI.md). Covered by the `UNIX vs YAGNI` row in [interactions.md](../interactions.md).
+- **SOLID** → See [SOLID.md](SOLID.md). Covered by the `UNIX vs SOLID` row in [interactions.md](../interactions.md).
+- **GoF** → See [GoF.md](GoF.md). Covered by the `GoF vs UNIX` row in [interactions.md](../interactions.md).
+- **FP** → See [FP.md](FP.md). Covered by the `FP vs UNIX` row in [interactions.md](../interactions.md).

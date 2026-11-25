@@ -52,7 +52,7 @@ YAGNI → KISS → DRY → SOLID
 |-------|------|----------|
 | 1. YAGNI | Scope | Does this feature need to exist at all? |
 | 2. KISS | Implementation | Is this the simplest expression of it? |
-| 3. DRY | Extraction | [WHEN] deciding whether to extract, read [references/principles/DRY.md](references/principles/DRY.md), the 2-vs-3 rule |
+| 3. DRY | Extraction | [WHEN] deciding whether to extract, read [references/principles/DRY.md](references/principles/DRY.md), the Three Strikes rule and its abstract-at-2 exception |
 | 4. SOLID | Architecture | Does the design pain justify the layer? |
 
 GoF patterns are SOLID's implementation toolbox (Phase 4), gated by Phases 1 and 2: don't reach for one until the variation it manages already exists.

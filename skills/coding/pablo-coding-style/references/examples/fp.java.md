@@ -65,7 +65,7 @@ List<String> names = customers.stream()
 ```
 
 Worth it here: three real steps (filter, filter, map). A single filter-then-map wouldn't earn
-a stream chain over a plain loop; see [references/interactions.md](../interactions.md)'s `FP vs KISS` row.
+a stream chain over a plain loop; see [interactions.md](../interactions.md)'s `FP vs KISS` row.
 
 ### Typed failure for a multi-step expected outcome
 

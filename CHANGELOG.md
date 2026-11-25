@@ -33,5 +33,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 
 ### Fixed
 
+- `skills/coding/pablo-coding-style/`: the link text of 28 references matches its relative target.
+- `skills/coding/pablo-coding-style/SKILL.md`: the DRY pipeline step names the rule `DRY.md` defines.
 - The linking helper and the install instructions use `PI_CODING_AGENT_DIR`, the variable the harness reads.
 - The index generator no longer takes a prose mention of the markers for the generated region.

@@ -51,8 +51,8 @@ See [`yagni.java.md`](../examples/yagni.java.md) and [`yagni.scala.md`](../examp
 ## Related Principles
 
 - **KISS** → See [KISS.md](KISS.md). Covered by the decision pipeline in [SKILL.md](../../SKILL.md): YAGNI gates everything, phase 1 precedes phase 2.
-- **DRY** → See [DRY.md](DRY.md). Covered by the `DRY vs YAGNI` row in [references/interactions.md](../interactions.md).
+- **DRY** → See [DRY.md](DRY.md). Covered by the `DRY vs YAGNI` row in [interactions.md](../interactions.md).
 - **SOLID** → See [SOLID.md](SOLID.md). Covered by the `YAGNI vs SOLID` row in the conflict matrix, [SKILL.md](../../SKILL.md).
 - **GoF** → See [GoF.md](GoF.md). Covered by the `GoF vs YAGNI` row in the conflict matrix, [SKILL.md](../../SKILL.md).
-- **FP** → See [FP.md](FP.md). Covered by the `FP vs YAGNI` row in [references/interactions.md](../interactions.md).
-- **UNIX** → See [UNX.md](UNX.md). Covered by the `UNIX vs YAGNI` row in [references/interactions.md](../interactions.md).
+- **FP** → See [FP.md](FP.md). Covered by the `FP vs YAGNI` row in [interactions.md](../interactions.md).
+- **UNIX** → See [UNX.md](UNX.md). Covered by the `UNIX vs YAGNI` row in [interactions.md](../interactions.md).
