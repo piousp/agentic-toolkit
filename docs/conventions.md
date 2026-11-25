@@ -121,3 +121,5 @@ Tables between `<!-- GENERATED:BEGIN -->` and `<!-- GENERATED:END -->` come from
 | Instructions file | Installs as the agent directory's `AGENTS.md`; no layering, so private rules share the same file |
 | Skill evaluation suites | Kept out of the skill they belong to: building and judging one is a separate job, and no artifact for it is published yet |
 | Category of a skill about skills | `general`, not `agent-authoring`: it applies to any task that produces a skill, and a category is navigation, not a claim about the subject |
+| Renaming during migration | `pablo-code-philosophy` becomes `pablo-coding-style`: skills cite each other by name, and the old name no longer describes the content (style plus the principles behind it), so the rename happens once, in the migration that publishes the artifact |
+| Self-contained artifacts | An artifact published here names no other skill or agent in its description, body or references, not even one this repository publishes; a name the reader may not have installed routes to nothing, and the rule reads the same without it. A dependency that must exist is declared per the Dependencies section instead |

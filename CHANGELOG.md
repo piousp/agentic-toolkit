@@ -20,9 +20,12 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `harness/README.md`: install mapping, the no-layering rule, what the prompt assumes.
 - `harness/settings.example.json` and `harness/mcp.example.json`: placeholders, no account values.
 - `agents/research/scout/AGENT.md`: first agent.
+- `skills/coding/pablo-coding-style/`: the coding style skill, migrated as a self-contained artifact that names no other skill.
+- `skills/coding/README.md`: category readme for skills and agents about writing and reviewing code.
 
 ### Changed
 
+- `docs/conventions.md`: decision-log entries for the rename during migration and for self-contained artifacts.
 - Example configuration moved to `harness/`.
 - The prompt rewritten in the agents' voice: labelled rules, `[ALWAYS]` and `[NEVER]` on the absolute ones.
 - The toolkit now calls itself an opinionated collection, in `README.md`, `AGENTS.md` and the GitHub description.

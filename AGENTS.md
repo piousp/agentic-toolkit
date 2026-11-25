@@ -56,6 +56,7 @@ tests/run_tests.sh
 
 <!-- GENERATED:BEGIN -->
 - `agents/research/scout/AGENT.md`
+- `skills/coding/pablo-coding-style/SKILL.md`
 - `skills/general/pablo-goal-discovery/SKILL.md`
 - `skills/general/writing-agent-skills/SKILL.md`
 - `skills/pi-tooling/find-pi-session/SKILL.md`
