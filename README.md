@@ -67,14 +67,23 @@ Six checks run in CI on every push:
 - `scripts/check_links.py` fails when a relative link or image in a Markdown file points at nothing.
 - `scripts/check_mirror.py` fails when the two prompt files stop matching section by section.
 
-A seventh check runs locally, when an artifact is about to join the catalog, because it needs a model that belongs to an account:
+A seventh check needs a model that belongs to an account, so it takes its configuration from the environment and commits nothing account-bound: `TOOLKIT_JUDGE_BASE_URL`, `TOOLKIT_JUDGE_MODEL` and `TOOLKIT_JUDGE_API_KEY`. Run it on the artifact being added:
 
 ```sh
-TOOLKIT_JUDGE_BASE_URL=... TOOLKIT_JUDGE_MODEL=... TOOLKIT_JUDGE_API_KEY=... \
-  scripts/check_overlap.py skills/<category>/<name>/SKILL.md
+scripts/check_overlap.py skills/<category>/<name>/SKILL.md
 ```
 
-It asks the configured decision model whether the candidate covers the work of an artifact already published, of any kind, and fails on a high overlap. No provider, model id or key is committed: without the three variables it stops with exit 2 instead of passing silently.
+It asks the configured decision model whether the candidate covers the work of an artifact already published, of any kind, and fails on a high overlap. `ci.yml` runs it as its own job on every push and pull request, over the artifacts that change adds; the repository stores the URL and the model as variables and the key as a secret. While the key is empty the job says so and judges nothing, and a pull request from a fork cannot run it at all, because repository secrets are not delivered there. Without the three values the check exits 2 instead of passing silently.
+
+### Pre-push hook
+
+Running the six offline checks before a push is optional:
+
+```sh
+ln -s ../../scripts/pre_push.sh .git/hooks/pre-push
+```
+
+The hook leaves out the overlap check, which belongs to CI, and checks the tree as it is, not the index. CI is the authority: a hook can be skipped with `--no-verify` and does not exist for anyone who never installed it.
 
 Documentation, code comments and commit messages are in English.
 

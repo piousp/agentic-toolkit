@@ -72,6 +72,26 @@ expect "check_overlap rejects non-numeric probabilities" 2 python3 scripts/check
 expect "check_overlap names missing configuration" 2 env -u TOOLKIT_JUDGE_BASE_URL -u TOOLKIT_JUDGE_MODEL -u TOOLKIT_JUDGE_API_KEY python3 scripts/check_overlap.py --root "$FIX/overlap/tree" skills/demo/demo-a/SKILL.md
 expect "check_overlap rejects a path that is not an artifact" 2 python3 scripts/check_overlap.py --root "$FIX/overlap/tree" --response-file "$FIX/overlap/high.json" README.md
 
+expect "check_overlap rejects an unresolvable base" 2 python3 scripts/check_overlap.py --added-since nosuchref
+expect "check_overlap reports nothing added" 0 python3 scripts/check_overlap.py --added-since HEAD
+
+# --added-since takes the candidates from git: a commit that adds an artifact
+# is judged against the catalog of that tree.
+tmp="$(mktemp -d)"
+mkdir -p "$tmp/skills/demo"
+cp -a "$FIX/overlap/tree/skills/demo/demo-a" "$FIX/overlap/tree/skills/demo/demo-b" "$tmp/skills/demo/"
+cp -a "$FIX/overlap/tree/agents" "$tmp/"
+git -C "$tmp" init -q
+git -C "$tmp" add -A
+git -C "$tmp" -c user.name=t -c user.email=t -c commit.gpgsign=false commit -qm base
+cp -a "$tmp/skills/demo/demo-a" "$tmp/skills/demo/demo-c"
+sed 's/^name: demo-a$/name: demo-c/' "$tmp/skills/demo/demo-c/SKILL.md" > "$tmp/skills/demo/demo-c/SKILL.new"
+mv "$tmp/skills/demo/demo-c/SKILL.new" "$tmp/skills/demo/demo-c/SKILL.md"
+git -C "$tmp" add -A
+git -C "$tmp" -c user.name=t -c user.email=t -c commit.gpgsign=false commit -qm "add demo-c"
+expect "check_overlap judges the artifact a commit added" 1 python3 scripts/check_overlap.py --root "$tmp" --response-file "$FIX/overlap/added.json" --added-since HEAD~1
+rm -rf "$tmp"
+
 expect "check_repo rejects a dangling skill reference" 1 python3 scripts/check_repo.py --root "$FIX/refs-bad"
 
 # find-pi-session resolves paths and stays read-only.

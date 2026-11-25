@@ -26,3 +26,31 @@ jobs:
         run: python3 scripts/check_mirror.py
       - name: Checks have tests
         run: tests/run_tests.sh
+
+  overlap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Judge configuration
+        id: config
+        env:
+          KEY: ${{ secrets.TOOLKIT_JUDGE_API_KEY }}
+        run: |
+          if [ -n "$KEY" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::TOOLKIT_JUDGE_API_KEY is empty, so no artifact is judged."
+          fi
+      - name: Overlap with published artifacts
+        if: steps.config.outputs.configured == 'true'
+        env:
+          TOOLKIT_JUDGE_BASE_URL: ${{ vars.TOOLKIT_JUDGE_BASE_URL }}
+          TOOLKIT_JUDGE_MODEL: ${{ vars.TOOLKIT_JUDGE_MODEL }}
+          TOOLKIT_JUDGE_API_KEY: ${{ secrets.TOOLKIT_JUDGE_API_KEY }}
+        run: python3 scripts/check_overlap.py --added-since "${{ github.event.pull_request.base.sha || github.event.before }}"

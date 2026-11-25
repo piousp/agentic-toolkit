@@ -31,6 +31,9 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `tests/fixtures/mirror/`: a pair of prompts that mirror each other and a pair that does not.
 - `tests/fixtures/overlap/`: saved judge responses covering each verdict and each error path.
 - `.github/workflows/ci.yml`: the changelog, link and mirror checks run on every push.
+- `.github/workflows/ci.yml`: the overlap check runs as its own job, over the artifacts a change adds.
+- `tests/fixtures/overlap/added.json`: saved response for the artifact a commit adds.
+- `scripts/pre_push.sh`: the six offline checks in one command, for a local pre-push hook.
 
 ### Changed
 
@@ -47,6 +50,10 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `docs/conventions.md`: the checks table names the new checks, and the decision log records the overlap check.
 - `tests/fixtures/valid/agents/general/demo-agent/AGENT.md`: the description names the skill it declares.
 - `CHANGELOG.md`: seven entries now start with their paths, as the rule asks.
+- `scripts/check_overlap.py`: each question names the artifact it asks about, because a decision model may ignore the question id.
+- `scripts/check_overlap.py`: `--added-since REF` judges the artifacts a commit added.
+- `tests/run_tests.sh`: cases for the artifact selection, including a throwaway git tree.
+- `README.md`, `AGENTS.md`, `docs/conventions.md`: the overlap check runs in CI, and the pre-push hook is documented.
 - `skills/general/pablo-goal-discovery/SKILL.md`: hyphens used as a pause become colons, semicolons and parentheses, in the prose and in the two format templates.
 
 ### Fixed

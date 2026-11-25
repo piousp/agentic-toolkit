@@ -1,0 +1,16 @@
+{
+  "answers": {
+    "overlap_skill_demo_a": {
+      "type": "choice",
+      "probabilities": {"none": 0.0006, "partial": 0.0014, "high": 0.9981}
+    },
+    "overlap_agent_demo_agent": {
+      "type": "choice",
+      "probabilities": {"none": 0.9843, "partial": 0.0024, "high": 0.0133}
+    },
+    "overlap_skill_demo_b": {
+      "type": "choice",
+      "probabilities": {"none": 0.9840, "partial": 0.0006, "high": 0.0155}
+    }
+  }
+}

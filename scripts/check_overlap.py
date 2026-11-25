@@ -3,6 +3,7 @@
 
 Usage:
   scripts/check_overlap.py [--root PATH] [--response-file PATH] [--timeout SECONDS] <candidate>
+  scripts/check_overlap.py [--root PATH] --added-since REF
 
 The candidate is one of:
   skills/<category>/<name>/SKILL.md
@@ -13,6 +14,16 @@ Every other artifact in the repository becomes a question: none, partial, or
 high overlap. The questions travel to a judge model in one request; the verdict
 is the highest probability among the three options, never the choice label the
 model returns.
+
+Each question names the artifact it asks about, and the state repeats that
+name, because a decision model may ignore the question id and answer a generic
+question otherwise.
+
+`--added-since REF` asks git which artifacts the commit added since REF and
+judges each one against the rest; a push reports a ref of zeros for a branch
+with no previous commit, which resolves to the parent of HEAD. One saved
+response covers one candidate, so a test with several candidates passes a
+single path instead.
 
 Configuration, read only when no response file is given:
   TOOLKIT_JUDGE_BASE_URL    base URL of the judge endpoint
@@ -28,6 +39,7 @@ Exit codes:
 import argparse
 import json
 import os
+import subprocess
 import sys
 import urllib.error
 import urllib.request
@@ -334,37 +346,49 @@ def report(results):
     return 0
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-    parser.add_argument("candidate", help="artifact to evaluate")
-    parser.add_argument(
-        "--root", default=None, help="repository root (default: parent of this script)"
-    )
-    parser.add_argument(
-        "--response-file", default=None, help="read a saved response instead of calling the judge"
-    )
-    parser.add_argument(
-        "--timeout", type=float, default=120.0, help="request timeout in seconds (default: 120)"
-    )
-    args = parser.parse_args()
+def added_candidates(root, ref):
+    """The artifacts a commit added since ref, as resolved paths.
 
-    root = Path(args.root).resolve() if args.root else Path(__file__).resolve().parent.parent
-    if not root.is_dir():
-        return fail(f"not a directory: {args.root}")
+    A ref of zeros, which is what a push reports for a branch without a
+    previous commit, resolves to the parent of HEAD.
+    """
+    base = "HEAD^" if set(ref) <= {"0"} else ref
+    resolved = run_git(root, "rev-parse", "--verify", "--quiet", f"{base}^{{commit}}")
+    if resolved.returncode != 0:
+        raise EvaluationError(f"cannot resolve {ref!r} as a commit in {root}")
+    diff = run_git(
+        root,
+        "diff",
+        "--name-only",
+        "--diff-filter=A",
+        base,
+        "HEAD",
+        "--",
+        "skills",
+        "agents",
+        "mcps",
+    )
+    if diff.returncode != 0:
+        raise EvaluationError(f"git diff failed: {diff.stderr.strip()}")
+    paths = []
+    for line in diff.stdout.splitlines():
+        path = (root / line.strip()).resolve()
+        if path.is_file() and artifact_shape(root, path) is not None:
+            paths.append(path)
+    return sorted(paths)
 
-    candidate_path = Path(args.candidate)
-    if not candidate_path.is_absolute():
-        candidate_path = root / candidate_path
-    candidate_path = candidate_path.resolve()
 
-    forms = ", ".join(ACCEPTED_FORMS)
-    if not candidate_path.is_file():
-        return fail(f"no such artifact: {args.candidate}; expected one of {forms}")
-    if artifact_shape(root, candidate_path) is None:
-        return fail(f"not an artifact path: {args.candidate}; expected one of {forms}")
+def run_git(root, *arguments):
+    try:
+        return subprocess.run(
+            ["git", "-C", str(root), *arguments], capture_output=True, text=True
+        )
+    except OSError as error:
+        raise EvaluationError(f"cannot run git: {error}")
 
+
+def evaluate(root, candidate_path, args):
+    """Judge one candidate against the rest of the catalog and report it."""
     candidate = describe(root, candidate_path)
     existing = [entry for entry in collect(root) if entry["path"] != candidate_path]
     if not existing:
@@ -406,6 +430,65 @@ def main():
         (entry, values, verdict(values)) for entry, values in zip(existing, answers)
     ]
     return report(results)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument("candidate", nargs="?", help="artifact to evaluate")
+    parser.add_argument(
+        "--added-since",
+        default=None,
+        metavar="REF",
+        help="evaluate every artifact the push added since REF",
+    )
+    parser.add_argument(
+        "--root", default=None, help="repository root (default: parent of this script)"
+    )
+    parser.add_argument(
+        "--response-file", default=None, help="read a saved response instead of calling the judge"
+    )
+    parser.add_argument(
+        "--timeout", type=float, default=120.0, help="request timeout in seconds (default: 120)"
+    )
+    args = parser.parse_args()
+
+    root = Path(args.root).resolve() if args.root else Path(__file__).resolve().parent.parent
+    if not root.is_dir():
+        return fail(f"not a directory: {args.root}")
+
+    if bool(args.candidate) == bool(args.added_since):
+        return fail("pass either a candidate path or --added-since REF")
+
+    forms = ", ".join(ACCEPTED_FORMS)
+    if args.added_since:
+        try:
+            candidates = added_candidates(root, args.added_since)
+        except EvaluationError as error:
+            return fail(str(error))
+        if not candidates:
+            print(f"check_overlap: nothing added since {args.added_since}")
+            return 0
+        if args.response_file and len(candidates) > 1:
+            return fail("a saved response covers one candidate: pass a candidate path instead")
+    else:
+        candidate_path = Path(args.candidate)
+        if not candidate_path.is_absolute():
+            candidate_path = root / candidate_path
+        candidate_path = candidate_path.resolve()
+        if not candidate_path.is_file():
+            return fail(f"no such artifact: {args.candidate}; expected one of {forms}")
+        if artifact_shape(root, candidate_path) is None:
+            return fail(f"not an artifact path: {args.candidate}; expected one of {forms}")
+        candidates = [candidate_path]
+
+    status = 0
+    for candidate_path in candidates:
+        if len(candidates) > 1:
+            print(f"check_overlap: candidate {candidate_path.relative_to(root).as_posix()}")
+        status = max(status, evaluate(root, candidate_path, args))
+    return status
 
 
 if __name__ == "__main__":
