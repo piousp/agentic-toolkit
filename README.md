@@ -54,6 +54,7 @@ Categories are created on first use and never reserved up front. The category is
 | `general` | 1 | 2 |
 | `pi-tooling` | 0 | 1 |
 | `research` | 2 | 0 |
+| `writing` | 0 | 1 |
 <!-- GENERATED:END -->
 
 ## Portability rules

@@ -69,4 +69,5 @@ tests/run_tests.sh
 - `skills/general/pablo-goal-discovery/SKILL.md`
 - `skills/general/writing-agent-skills/SKILL.md`
 - `skills/pi-tooling/find-pi-session/SKILL.md`
+- `skills/writing/pablo-humanize-text/SKILL.md`
 <!-- GENERATED:END -->

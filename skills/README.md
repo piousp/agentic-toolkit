@@ -17,4 +17,5 @@ Rules for adding one are in `AGENTS.md`.
 | [`pablo-goal-discovery`](./general/pablo-goal-discovery/SKILL.md) | `general` | Use when a vague or under-specified ask must become a confirmed goal before work begins. Runs the mattpocock grilling interview: rounds of numbered decisions... |
 | [`writing-agent-skills`](./general/writing-agent-skills/SKILL.md) | `general` | Use when authoring, reviewing or refurbishing an agent Skill: writing SKILL.md frontmatter and body, structuring the scripts/references/assets folders, tight... |
 | [`find-pi-session`](./pi-tooling/find-pi-session/SKILL.md) | `pi-tooling` | Locate the current pi session and its artifact directory from the variables pi exports. Use when a skill must write run artifacts next to the session, or whe... |
+| [`pablo-humanize-text`](./writing/pablo-humanize-text/SKILL.md) | `writing` | Write or rewrite any text so it reads as naturally human, in any genre: code comments, PR reviews, summaries, text edits, emails, and academic prose. Use bef... |
 <!-- GENERATED:END -->

@@ -38,6 +38,9 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `agents/research/web-scout/AGENT.md`: the web recon agent, with its two-query budget, failure JSON and lens mode.
 - `agents/general/analyst/AGENT.md`: the analysis agent, with its evidence labels, severity scale and lens mode.
 - `agents/general/README.md`: category readme for agents usable in any task.
+- `skills/writing/pablo-humanize-text/`: the humanize-text skill, migrated with its English and Spanish references.
+- `skills/writing/README.md`: category readme for text production and revision.
+- `docs/conventions.md`: decision-log entries for the second rename and for Spanish references read as functional content.
 
 ### Changed
 
