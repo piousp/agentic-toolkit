@@ -92,17 +92,17 @@ Ask the whole frontier in one round, as Markdown headings:
 ```markdown
 ### 🧭 Round 1 - frontier
 
-#### ❓ Q1 - Alcance del contenido
+#### ❓ Q1 - Content scope
 
-- 🔹 **Option A:** sólo artefactos de harness.
-- 🔹 **Option B:** A más extensiones y temas.
-- ✅ **Recommendation:** A, porque los paquetes npm tienen su propio ciclo.
-- 💡 **Fact:** el descubrimiento de agentes es de un solo nivel.
+- 🔹 **Option A:** harness artifacts only.
+- 🔹 **Option B:** A plus extensions and themes.
+- ✅ **Recommendation:** A, because the npm packages have their own cycle.
+- 💡 **Fact:** agent discovery reads one directory level only.
 
-#### ❓ Q2 - Relación con el repo anterior
+#### ❓ Q2 - Relation to the previous repository
 
-- 🔹 **Option A:** repo nuevo por copia curada.
-- ✅ **Recommendation:** A, condicionada a una auditoría de historial.
+- 🔹 **Option A:** new repository built from a curated copy.
+- ✅ **Recommendation:** A, conditional on a history audit.
 ```
 
 - [ALWAYS] one `####` heading per question, numbered `Q<N>` continuously
@@ -114,6 +114,8 @@ Ask the whole frontier in one round, as Markdown headings:
   at the end of an option.
 - [NEVER] use a heading level deeper than `####`: it stops reading as a
   heading in the terminal.
+- [ALWAYS] write rounds in the language the user writes in; the example above
+  shows structure, not language.
 - Close the last round with the line `🧭 Frontier: empty`.
 
 ## Fact lookups via subagent
