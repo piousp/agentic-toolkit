@@ -15,7 +15,7 @@ The rules apply to every kind of writing: code comments, PR reviews,
 summaries, edits, emails, academic prose. Nothing here is domain-specific.
 
 **Working language.** If the working language is Spanish, read
-`references/es.md` for a Spanish-language reference version of this skill,
+`SKILL.es.md` for a Spanish-language reference version of this skill,
 then apply the same rules with the Spanish banned list and voice files
 (`references/banned-list-es.md`, `references/voice-es.md`).
 

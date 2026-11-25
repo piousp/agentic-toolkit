@@ -72,6 +72,8 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `skills/writing/pablo-humanize-text/SKILL.md`, `skills/writing/pablo-humanize-text/references/es.md`: the title matches the artifact name.
 - `skills/writing/pablo-humanize-text/references/banned-list-en.md`, `skills/writing/pablo-humanize-text/references/banned-list-es.md`: the header states the review date and drops the detector claim.
 - `skills/writing/pablo-humanize-text/references/banned-list-en.md`: future-narrative closers and narrated candor join the closers table.
+- `skills/writing/pablo-humanize-text/SKILL.md`, `skills/writing/pablo-humanize-text/SKILL.es.md`: the Spanish mirror moves beside the skill, and the working-language line points at it.
+- `AGENTS.md`, `skills/AGENTS.md`, `docs/conventions.md`: a skill may ship a Spanish mirror, and the rules state that the pair changes in the same edit.
 
 ### Fixed
 

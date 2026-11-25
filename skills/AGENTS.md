@@ -9,6 +9,7 @@ Every skill is a directory holding a `SKILL.md`:
 ```text
 skills/<category>/<name>/
   SKILL.md
+  SKILL.es.md     optional: the same instructions in Spanish, matching section by section
   scripts/        optional: commands the skill runs
   references/     optional: material the skill reads
   assets/         optional: templates and fixtures
@@ -32,6 +33,7 @@ Optional Harness fields (`license`, `compatibility`, `metadata`, `allowed-tools`
 - Every path inside a skill is relative to the skill directory.
 - Cross-references to other skills use one of two forms: `skill:<name>`, or a relative link ending in `SKILL.md`. The repository check fails when the target does not exist. References to agents in prose are not checked yet.
 - No project-specific, employer-specific or machine-specific details.
+- A skill that ships `SKILL.es.md` changes both files in the same edit. `scripts/check_mirror.py` guards the harness pair only, so this parity is held by hand.
 
 ## Index
 

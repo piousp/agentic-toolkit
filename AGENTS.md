@@ -28,7 +28,7 @@ The tables at the end of the index files are produced by `scripts/gen_index.py`.
 
 ## Bilingual files
 
-`harness/PROMPT.md` and `harness/PROMPT.es.md` are mirrors: same sections, same rules, same order, one per language. Change both in the same edit. They are the only documented exception to English-only documentation.
+`harness/PROMPT.md` and `harness/PROMPT.es.md` are mirrors: same sections, same rules, same order, one per language. A skill may ship the same pair for its own instructions: `SKILL.md` and `SKILL.es.md` at the skill root, matching section by section. Change a pair in the same edit. These two pairs are the only documented exception to English-only documentation.
 
 ## Changelog rules
 
