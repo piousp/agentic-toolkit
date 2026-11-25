@@ -50,7 +50,7 @@ Categories are created on first use and never reserved up front. The category is
 <!-- GENERATED:BEGIN -->
 | Category | Agents | Skills |
 |---|---|---|
-| `general` | 0 | 1 |
+| `general` | 0 | 2 |
 | `pi-tooling` | 0 | 1 |
 | `research` | 1 | 0 |
 <!-- GENERATED:END -->

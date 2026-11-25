@@ -119,3 +119,5 @@ Tables between `<!-- GENERATED:BEGIN -->` and `<!-- GENERATED:END -->` come from
 | Agent categories | Same vocabulary as skills, one level above the agent directory |
 | Skill categories | Created on first use, `README.md` per category, no lifecycle buckets |
 | Instructions file | Installs as the agent directory's `AGENTS.md`; no layering, so private rules share the same file |
+| Skill evaluation suites | Kept out of the skill they belong to: building and judging one is a separate job, and no artifact for it is published yet |
+| Category of a skill about skills | `general`, not `agent-authoring`: it applies to any task that produces a skill, and a category is navigation, not a claim about the subject |
