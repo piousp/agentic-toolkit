@@ -1,4 +1,4 @@
-# Escritura con Voz Humana (referencia en español)
+# Humanizar el Texto (referencia en español)
 
 Traducción de referencia de `SKILL.md`. No es un skill cargable por separado;
 úsala para redactar en español con las mismas reglas, ejemplos y listas
@@ -21,8 +21,8 @@ aquí es específico de un solo dominio.
 Absolutas. Romper una obliga a reescribir.
 
 - **[NEVER]** usar guion largo para enfatizar o para conectar ideas. Usar
-  punto, coma o punto y coma. El guion largo es la marca más fuerte de
-  texto generado.
+  punto, coma o punto y coma. La voz del autor no los usa; la prohibición
+  vale en cualquier contexto.
 - **[NEVER]** cerrar con una frase de manual. La última frase del texto es
   el último punto concreto, no un resumen del texto. Los cierres
   prohibidos están en `banned-list-es.md`.
@@ -48,11 +48,10 @@ Hábitos con criterio, no una lista de control.
   que "se observa que el test falla en la línea 12". La pasiva sirve cuando
   el agente de la acción se desconoce o no importa.
 - **[ALWAYS]** variar la longitud y el ritmo de las frases. Tras una frase
-  larga, una corta. Empezar unas por el verbo, otras por el sujeto, otras
-  por una subordinada. El texto generado tiene poca burstiness (ritmo
-  uniforme) y poca perplejidad (elección de palabras demasiado predecible);
-  los detectores combinan ambas señales con marcadores de vocabulario, así
-  que cambiar sinónimos no los engaña.
+  larga, una corta. O dos frases cortas, o dos largas. Variar la variación.
+  Empezar unas por el verbo, otras por el sujeto, otras por una subordinada.
+  Variarlo es un hábito de oficio, nunca un fin en sí mismo: el ritmo
+  uniforme y la variación forzada son el mismo defecto.
 - **[ALWAYS]** tomar postura. Decir qué falla, qué está bien, qué cambiaría.
   Un resumen neutro suena a máquina. Una opinión clara, aunque sea leve,
   suena humana. "El estudio reporta una ganancia del 12 %, pero el grupo de
@@ -85,10 +84,16 @@ académico):
    prohibidas y la descripción de voz abiertas.
 4. **Solo crítica.** Leer el borrador y anotar qué rompe las reglas: dónde
    el ritmo es plano, dónde se esconde la postura, qué palabra prohibida
-   se coló. Solo diagnosticar. No reescribir todavía.
+   se coló. Solo diagnosticar. No reescribir todavía. Si el borrador no
+   rompe ninguna regla dura y ya se lee como las muestras few-shot (o la
+   descripción de voz), entregarlo sin cambios; reescribir un borrador
+   bueno lo empeora.
 5. **Reescritura por edición.** Corregir el borrador frase por frase,
-   partiendo de la crítica. Conservar el significado y el detalle. Nunca
-   añadir argumentos nuevos para estirar el texto.
+   partiendo de la crítica. Corregir las construcciones antes que las
+   palabras: ritmo plano, postura escondida, cierres de manual, atenuantes
+   apilados; el barrido de palabras prohibidas va después de las
+   correcciones de construcción. Conservar el significado y el detalle.
+   Nunca añadir argumentos nuevos para estirar el texto.
 
 **Texto corto** (un comentario de código, una respuesta, una línea de
 asunto): saltarse los pasos. Aplicar las reglas duras y suaves directamente,
@@ -103,6 +108,9 @@ entregar.
 - ¿Hay alguna palabra de la lista prohibida?
 - ¿Termina con un cierre de manual o un comentario sobre el propio texto?
 - ¿Varían las longitudes de frase o todas tienen la misma forma?
+- ¿Algún pasaje se lee más plano que el borrador del que salió? Una pasada
+  que solo recorta sale uniformemente plana; reponer el énfasis que una
+  persona dejaría, en el registro del autor.
 - ¿Se ve la postura, o un lector neutro no sabría qué piensa el autor?
 - ¿Cada afirmación es concreta, con un nombre, una cifra o un ejemplo detrás?
 - ¿El autor reconocería su propia voz en este texto?

@@ -67,6 +67,11 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `skills/general/pablo-goal-discovery/SKILL.md`: hyphens used as a pause become colons, semicolons and parentheses, in the prose and in the two format templates.
 - `agents/research/README.md`: analysis leaves the category description, since the agent that does it lives in `general`.
 - `docs/conventions.md`: an agent may name another agent once, in parentheses, as a routing hint.
+- `skills/writing/pablo-humanize-text/SKILL.md`, `skills/writing/pablo-humanize-text/references/es.md`: the em-dash ban rests on the author's voice, and sentence variation becomes a craft habit rather than a detector signal.
+- `skills/writing/pablo-humanize-text/SKILL.md`, `skills/writing/pablo-humanize-text/references/es.md`: the rewrite fixes constructions before words, a sound draft may ship unchanged, and the self-check catches a flattened passage.
+- `skills/writing/pablo-humanize-text/SKILL.md`, `skills/writing/pablo-humanize-text/references/es.md`: the title matches the artifact name.
+- `skills/writing/pablo-humanize-text/references/banned-list-en.md`, `skills/writing/pablo-humanize-text/references/banned-list-es.md`: the header states the review date and drops the detector claim.
+- `skills/writing/pablo-humanize-text/references/banned-list-en.md`: future-narrative closers and narrated candor join the closers table.
 
 ### Fixed
 

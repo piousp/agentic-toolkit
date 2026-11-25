@@ -1,9 +1,12 @@
 # AI-Tell Vocabulary: English Banned List
 
+Last reviewed: 2026-11-25. A lint aid for the author's voice, not a
+detector; entries age.
+
 Read this file before writing in English. Keep it open while drafting.
 The fix for a banned word is a rewrite of the sentence, never a synonym
-swap. Detectors combine rhythm, predictability, and vocabulary markers;
-changing one word leaves the other tells standing.
+swap. Changing one word leaves the constructions that make prose read as
+machine-made.
 
 ## Tier 1: hard AI-tell vocabulary
 
@@ -22,6 +25,8 @@ the sentence around it.
 | "not only... but also" | formulaic contrast |
 | "it's important to note", "it is worth noting" | throat-clearing |
 | "in conclusion", "in summary", "in closing", "to sum up" | formula closers |
+| "may become one of the most...", "will shape how we..." | future-narrative closers |
+| "in the interest of full disclosure", "I would rather flag this than let you discover it later" | narrated candor |
 | "paving the way", "shed light on", "serves as", "testament to" | clichéd linking |
 | "valuable insights", "the rise of", "it remains to be seen" | stock phrases |
 | "glimpse into", "ever-evolving", "ever-changing" | filler outlook |
@@ -40,6 +45,11 @@ the sentence around it.
 follows the same [NEVER] criterion. A literal instance, such as a legal
 "last testament", is the exact-right-term case: rewrite the sentence
 around it.
+
+Both newer rows are constructions, not single words. A forecast the text
+has earned is not a future-narrative closer. A real disclosure ("in the
+interest of full disclosure, I own shares in...") carries content and is
+the exact-right-term case: rewrite around it.
 
 ## Tier 2: weak modifiers to trim
 

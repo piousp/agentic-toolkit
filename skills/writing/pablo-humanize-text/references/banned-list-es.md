@@ -1,10 +1,12 @@
 # Vocabulario que delata a una IA: lista prohibida en español
 
+Última revisión: 2026-11-25. Ayuda de lint para la voz del autor, no un
+detector; las entradas caducan.
+
 Leer este archivo antes de escribir en español. Tenerlo a la vista mientras
 se redacta. La solución ante una palabra prohibida es reescribir la frase,
-nunca cambiarla por un sinónimo. Los detectores combinan ritmo,
-predecibilidad y marcadores de vocabulario; cambiar una palabra deja las
-otras señales en pie.
+nunca cambiarla por un sinónimo. Cambiar una palabra deja en pie las
+construcciones que hacen que el texto suene a máquina.
 
 ## Nivel 1: vocabulario duro de marca IA
 
