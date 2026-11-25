@@ -30,7 +30,7 @@ Optional Harness fields (`license`, `compatibility`, `metadata`, `allowed-tools`
 
 - Instructions, in the imperative, addressed to the agent that loads the skill.
 - Every path inside a skill is relative to the skill directory.
-- Cross-references to other skills name them explicitly; the repository check fails when a named skill does not exist.
+- Cross-references to other skills use one of two forms: `skill:<name>`, or a relative link ending in `SKILL.md`. The repository check fails when the target does not exist. References to agents in prose are not checked yet.
 - No project-specific, employer-specific or machine-specific details.
 
 ## Index

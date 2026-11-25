@@ -16,6 +16,8 @@ from pathlib import Path
 
 CATEGORY_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 FIELD_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*):(.*)$")
+SKILL_REF_RE = re.compile(r"skill:([a-z0-9][a-z0-9-]*)")
+SKILL_LINK_RE = re.compile(r"\]\(([^)\s]+?/SKILL\.md)\)")
 BLOCK_MARKERS = {">", "|", ">-", "|-", ">+", "|+"}
 MIN_DESCRIPTION = 20
 
@@ -119,6 +121,25 @@ def validate(kind, paths, root, skill_names):
     return errors
 
 
+def validate_references(kind, paths, root, skill_names):
+    """Check the two reference forms: `skill:<name>` and links to a SKILL.md."""
+    errors = []
+    for path in paths:
+        label = f"{kind} {path.relative_to(root)}"
+        text = path.read_text(encoding="utf-8")
+        for match in SKILL_REF_RE.finditer(text):
+            name = match.group(1)
+            if name not in skill_names:
+                errors.append(
+                    f"{label}: references skill:{name}, which this repository does not publish"
+                )
+        for match in SKILL_LINK_RE.finditer(text):
+            target = (path.parent / match.group(1)).resolve()
+            if not target.is_file():
+                errors.append(f"{label}: link to a missing file: {match.group(1)}")
+    return errors
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", default=None, help="repository root (default: parent of this script)")
@@ -138,6 +159,8 @@ def main():
 
     errors = validate("skill", skills, root, skill_names)
     errors += validate("agent", agents, root, skill_names)
+    errors += validate_references("skill", skills, root, skill_names)
+    errors += validate_references("agent", agents, root, skill_names)
 
     for error in errors:
         print(f"check_repo: {error}")

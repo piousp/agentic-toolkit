@@ -26,6 +26,7 @@ Auditability checks worth building:
 
 - A per-agent trace: inputs accepted, files read, decisions taken, output shape.
 - A consistency check between an agent's declared tools and the tools its prompt asks for.
+- Reference checking for agent names in prose (`agent:<name>`), the counterpart of the skill reference check that already runs.
 - A report of which agents still depend on skills, and why.
 
 Exit criterion: an agent's behavior can be reviewed from its artifacts alone, without running it.

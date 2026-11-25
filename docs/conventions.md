@@ -34,7 +34,9 @@ Harness fields follow the reference harness and are documented in the artifact w
 
 An agent may declare `skills:`, and only skills published here. `scripts/check_repo.py` fails otherwise.
 
-Self-containment is the default, because a self-contained agent works in any harness while a dependent one works only when its skills are installed too. When a dependency is kept, it is a reviewed decision, stated in the agent's description. Each case is examined on its own: there is no blanket policy that a new agent must or must not depend on skills.
+A skill that needs another one says so with `skill:<name>`, or with a relative link ending in `SKILL.md`; the same check fails when the target is missing. Prose mentions of agents inside skills are not checked yet: the agent name has to exist for the reference to work, but nothing enforces it.
+
+Self-containment is the default. A skill that depends on another one is installable alone only if the dependency is installed too, and that is stated in its description.
 
 ## Portability
 
