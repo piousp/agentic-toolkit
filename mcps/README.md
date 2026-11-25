@@ -4,7 +4,7 @@ MCP servers authored here, published so that a clone gives the source and the RE
 
 Nothing is published yet.
 
-`mcp.example.json` at the repository root shows the shape of a server entry, with placeholders only.
+`harness/mcp.example.json` shows the shape of a server entry, with placeholders only.
 
 Rules for adding a server are in `AGENTS.md`.
 

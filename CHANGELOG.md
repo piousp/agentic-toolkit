@@ -15,3 +15,18 @@ All notable changes to this repository are recorded here. The format follows Kee
 - `.github/workflows/ci.yml`: runs every check on push and pull request.
 - `settings.example.json` and `mcp.example.json`: placeholders with no account-specific values.
 - First agent migrated: `agents/research/scout/AGENT.md`.
+
+### Changed
+
+- Example configuration moved to `harness/`, together with the system instructions.
+
+### Added in `harness/`
+
+- `PROMPT.md`: the author's working prompt, distilled for publication, English.
+- `PROMPT.es.md`: the same prompt in Spanish, section for section.
+- `README.md`: install mapping, the no-layering constraint, and what the prompt assumes.
+
+### Fixed
+
+- The agent linking helper and the install instructions now use `PI_CODING_AGENT_DIR`, the variable the harness actually reads.
+- The index generator no longer mistakes a prose mention of the generated markers for the generated region.

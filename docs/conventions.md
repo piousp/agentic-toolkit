@@ -69,6 +69,17 @@ Several agents accept a lens: a Markdown file whose path arrives as ``Lens: <pat
 
 There is no `lenses/` directory yet: no lens in the author's setup is publishable. When the first one is, the contract above is what it must satisfy. Locally, lenses live in the harness's own lens directory.
 
+## Harness wiring
+
+`harness/` holds what installs into the harness agent directory rather than what a project consumes: the system instructions (`PROMPT.md` and its Spanish mirror `PROMPT.es.md`), and the settings and MCP placeholders. The agent directory is `~/.pi/agent` by default, moved by `PI_CODING_AGENT_DIR`.
+
+Two rules follow from how a harness loads context files:
+
+- One instructions file per directory. `AGENTS.override.md` replaces `AGENTS.md` in that directory instead of appending to it, so there is no additive overlay: private rules live in the same file, never in a second user-level one.
+- The prompt is opinionated, not neutral. It demands confirmation before editing an existing file even when the request names the edit. That is the author's own behaviour, published as-is and labelled as such in `harness/README.md`.
+
+The two prompt files are the one documented exception to the English-only rule: they are byte-for-byte mirrors in two languages, and installing one excludes the other because they install to the same path.
+
 ## Generated index
 
 Tables between `<!-- GENERATED:BEGIN -->` and `<!-- GENERATED:END -->` come from `scripts/gen_index.py`, which reads each artifact's frontmatter. CI runs it with `--check` and fails on drift, so an index cannot describe a state of the tree that no longer exists.
@@ -98,10 +109,11 @@ Tables between `<!-- GENERATED:BEGIN -->` and `<!-- GENERATED:END -->` come from
 | Repository scope | Skills, agents and MCP servers; no harness plugins, no npm packages |
 | Relationship to the author's previous repository | New repository, curated copy; the old one is frozen |
 | Content pass | Skeleton first; artifacts migrate one at a time, on request |
-| Language | English, including documentation |
+| Language | English, including documentation, with one exception: `harness/PROMPT` exists in English and Spanish as a mirror |
 | Harness | Pi first, with Claude Code compatibility noted where it differs |
 | License and visibility | MIT, public from the first commit |
 | Third-party artifacts | Not included, not recommended |
 | Deployment index | No `llms.txt`; `AGENTS.md` and `README.md` per directory, with generated tables |
 | Agent categories | Same vocabulary as skills, one level above the agent directory |
 | Skill categories | Created on first use, `README.md` per category, no lifecycle buckets |
+| Instructions file | Installs as the agent directory's `AGENTS.md`; no layering, so private rules share the same file |

@@ -8,7 +8,7 @@
 # Usage:
 #   scripts/link_agents.sh --dry-run
 #   scripts/link_agents.sh
-#   PI_AGENT_DIR=<dir> scripts/link_agents.sh
+#   PI_CODING_AGENT_DIR=<dir> scripts/link_agents.sh
 #
 # It never deletes and never overwrites: an existing target that is not a
 # symlink to the same source is reported and skipped.
@@ -16,7 +16,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TARGET_ROOT="${PI_AGENT_DIR:-$HOME/.pi/agent}/agents"
+TARGET_ROOT="${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/agents"
 dry_run=0
 
 for arg in "$@"; do

@@ -11,6 +11,7 @@ A public, portable collection of skills, agents and MCP servers. Portability out
 - Skills: `skills/<category>/<name>/SKILL.md`. Supporting files (`scripts/`, `references/`, `assets/`) sit beside the `SKILL.md` and are referenced by relative path.
 - Agents: `agents/<category>/<name>/AGENT.md`. Supporting files (`references/`, `scripts/`, `tests/`) sit beside the `AGENT.md` and travel with the agent.
 - MCP servers: `mcps/<name>/` with its own `README.md`. Only servers authored in this repository; third-party servers are used directly from their upstream package.
+- Harness wiring: `harness/` holds the system instructions and the example configuration. It is not an artifact: no frontmatter, no generated index, and no artifact name to match.
 - Never create a category directory before its first artifact. No placeholder directories, no `.gitkeep`.
 
 ## Frontmatter rules
@@ -24,6 +25,10 @@ A public, portable collection of skills, agents and MCP servers. Portability out
 ## Generated content
 
 The tables at the end of the index files are produced by `scripts/gen_index.py`. Do not edit them by hand; run the script.
+
+## Bilingual files
+
+`harness/PROMPT.md` and `harness/PROMPT.es.md` are mirrors: same sections, same rules, same order, one per language. Change both in the same edit. They are the only documented exception to English-only documentation.
 
 ## Portability rules
 

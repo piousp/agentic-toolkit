@@ -50,5 +50,18 @@ else
 fi
 rm -rf "$tmp"
 
+# The two prompts are mirrors: same section and rule counts.
+en_sections=$(grep -c '^## ' harness/PROMPT.md)
+es_sections=$(grep -c '^## ' harness/PROMPT.es.md)
+en_rules=$(grep -c '^- ' harness/PROMPT.md)
+es_rules=$(grep -c '^- ' harness/PROMPT.es.md)
+if [ "$en_sections" = "$es_sections" ] && [ "$en_rules" = "$es_rules" ]; then
+  echo "ok   prompts mirror each other ($en_sections sections, $en_rules rules)"
+  passed=$((passed + 1))
+else
+  echo "FAIL prompts drifted: en $en_sections/$en_rules, es $es_sections/$es_rules"
+  failed=$((failed + 1))
+fi
+
 echo "tests: $passed passed, $failed failed"
 [ "$failed" -eq 0 ]

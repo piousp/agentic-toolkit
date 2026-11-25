@@ -24,9 +24,11 @@ scripts/link_agents.sh --dry-run   # print what would be linked
 scripts/link_agents.sh             # link every agent into the harness directory
 ```
 
-The script links `agents/<category>/<name>/` to `$PI_AGENT_DIR/agents/<name>/`, so `references/`, `scripts/` and `tests/` travel with the agent. It is a development helper, not the installer, and it never deletes anything.
+The script links `agents/<category>/<name>/` to `$PI_CODING_AGENT_DIR/agents/<name>/`, so `references/`, `scripts/` and `tests/` travel with the agent. It is a development helper, not the installer, and it never deletes anything.
 
-Per-agent model choices are not part of an artifact: they depend on the account, the budget and the task. Start from `settings.example.json` and fill in the models the harness actually offers.
+System instructions and harness configuration are in `harness/`: the prompt installs as the agent directory's `AGENTS.md`, and the two example files hold the settings and MCP placeholders. See `harness/README.md` for the commands.
+
+Per-agent model choices are not part of an artifact: they depend on the account, the budget and the task. Start from `harness/settings.example.json` and fill in the models the harness actually offers.
 
 ## Layout
 
@@ -34,6 +36,8 @@ Per-agent model choices are not part of an artifact: they depend on the account,
 skills/<category>/<name>/SKILL.md     skill; scripts, references, assets live beside it
 agents/<category>/<name>/AGENT.md     agent; references, scripts, tests live beside it
 mcps/<name>/                          MCP servers authored here
+harness/PROMPT.md                     system instructions; installs as <agent-dir>/AGENTS.md
+harness/PROMPT.es.md                  the same prompt in Spanish
 docs/                                 conventions and roadmap
 scripts/                              repository checks and helpers
 tests/                                checks for the checks

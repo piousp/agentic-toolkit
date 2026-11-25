@@ -19,7 +19,7 @@ No `node_modules`, no build output, no bundled binaries. The README states the i
 
 ## Configuration
 
-`mcp.example.json` at the repository root shows the shape of an entry and contains no real paths: every value is a placeholder. A generated config belongs to the user, not to this repository.
+`harness/mcp.example.json` shows the shape of an entry and contains no real paths: every value is a placeholder. A generated config belongs to the user, not to this repository.
 
 ## Index
 
