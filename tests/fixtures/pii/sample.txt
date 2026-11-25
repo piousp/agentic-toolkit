@@ -1,0 +1,7 @@
+Synthetic violations for the portability check. Every value here is fake.
+
+home path: /home/example/project
+windows path: C:\Users\example\project
+address: 10.0.0.1
+hardware: aa:bb:cc:dd:ee:ff
+contact: someone@example.com

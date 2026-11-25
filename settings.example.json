@@ -1,0 +1,10 @@
+{
+  "pi-simple-agents": {
+    "agentOverrides": {
+      "scout": {
+        "model": "<provider>/<model>",
+        "thinking": "off"
+      }
+    }
+  }
+}

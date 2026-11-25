@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "<server-name>": {
+      "command": "node",
+      "args": [
+        "<path to mcps/server-name/dist/index.js>"
+      ],
+      "description": "<one line: what the server exposes>"
+    }
+  }
+}
