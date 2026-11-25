@@ -116,7 +116,7 @@ Tables between `<!-- GENERATED:BEGIN -->` and `<!-- GENERATED:END -->` come from
 | License and visibility | MIT, public from the first commit |
 | Third-party artifacts | Not included, not recommended |
 | Deployment index | No `llms.txt`; `AGENTS.md` and `README.md` per directory, with generated tables |
-| Agent categories | Same vocabulary as skills, one level above the agent directory |
+| Agent categories | Same vocabulary as skills, one level above the agent directory, with a `README.md` per category as for skills |
 | Skill categories | Created on first use, `README.md` per category, no lifecycle buckets |
 | Instructions file | Installs as the agent directory's `AGENTS.md`; no layering, so private rules share the same file |
 | Skill evaluation suites | Kept out of the skill they belong to: building and judging one is a separate job, and no artifact for it is published yet |
