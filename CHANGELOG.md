@@ -29,6 +29,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - Example configuration moved to `harness/`.
 - The prompt rewritten in the agents' voice: labelled rules, `[ALWAYS]` and `[NEVER]` on the absolute ones.
 - The toolkit now calls itself an opinionated collection, in `README.md`, `AGENTS.md` and the GitHub description.
+- `AGENTS.md`: rules for the changelog.
 
 ### Fixed
 
