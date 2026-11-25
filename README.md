@@ -1,6 +1,6 @@
 # agentic-toolkit
 
-A portable collection of skills, agents and MCP servers for coding agents. Pi is the reference harness; any harness that reads `skills/<name>/SKILL.md` or a directory-level `AGENTS.md` works too.
+An opinionated collection of skills, agents and MCP servers for coding agents. Pi is the reference harness; any harness that reads `skills/<name>/SKILL.md` or a directory-level `AGENTS.md` works too.
 
 Every artifact here is meant to be copied or linked into a harness and used as-is: relative paths only, no machine state, no personal data, no pinned provider. Content that cannot meet that rule stays out of this repository.
 

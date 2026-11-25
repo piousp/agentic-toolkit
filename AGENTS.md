@@ -4,7 +4,7 @@ Instructions for agents working in this repository. Human-facing documentation l
 
 ## What this repository is
 
-A public, portable collection of skills, agents and MCP servers. Portability outranks convenience: an artifact that cannot be copied to another machine unchanged does not belong here.
+A public, opinionated collection of skills, agents and MCP servers. Portability outranks convenience: an artifact that cannot be copied to another machine unchanged does not belong here.
 
 ## Layout rules
 
