@@ -22,6 +22,7 @@ All notable changes to this repository are recorded here. The format follows Kee
 ### Changed
 
 - Example configuration moved to `harness/`, together with the system instructions.
+- `harness/PROMPT.md` and `harness/PROMPT.es.md` rewritten in the agents' voice: the opening line declares the coordinator identity, each rule in the five rule sections carries a bold label, and `[ALWAYS]`/`[NEVER]` mark the absolute ones where the label is not already the prohibition. No rule removed.
 
 ### Added in `harness/`
 

@@ -34,6 +34,6 @@ The harness also reads `<agent-dir>/APPEND_SYSTEM.md`, which adds instructions t
 `PROMPT.md` is the author's own working prompt, published as-is. Two consequences:
 
 - It requires confirmation before every edit of an existing file, even when the request already names the edit. Most instructions files do not. To get the conventional behavior, delete the `Changing state` section and leave `Non-negotiables` to say "editing an existing file the user did not ask for".
-- It assumes the harness may expose subagents, and conditions the coordinator role on that.
+- It declares the coordinator role outright, and conditions the routing of the work on subagents being available: without them, the same rules apply to direct work.
 
 Nothing else in it depends on a particular harness, provider or account.

@@ -80,7 +80,7 @@ Two rules follow from how a harness loads context files:
 - One instructions file per directory. `AGENTS.override.md` replaces `AGENTS.md` in that directory instead of appending to it, so there is no additive overlay: private rules live in the same file, never in a second user-level one.
 - The prompt is opinionated, not neutral. It demands confirmation before editing an existing file even when the request names the edit. That is the author's own behaviour, published as-is and labelled as such in `harness/README.md`.
 
-The two prompt files are the one documented exception to the English-only rule: they are byte-for-byte mirrors in two languages, and installing one excludes the other because they install to the same path.
+The two prompt files are the one documented exception to the English-only rule: they are mirrors in two languages, section for section, and installing one excludes the other because they install to the same path.
 
 ## Generated index
 
