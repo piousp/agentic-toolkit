@@ -30,6 +30,15 @@ The tables at the end of the index files are produced by `scripts/gen_index.py`.
 
 `harness/PROMPT.md` and `harness/PROMPT.es.md` are mirrors: same sections, same rules, same order, one per language. Change both in the same edit. They are the only documented exception to English-only documentation.
 
+## Changelog rules
+
+`CHANGELOG.md` records what changed, not what was versioned. The repository publishes no releases, so there are no version headings and no `[Unreleased]` block.
+
+- One block per date, headed `## YYYY-MM-DD`, newest first. A change joins that date's block; do not open an empty block.
+- Allowed sections, in this order: `### Added`, `### Changed`, `### Fixed`, `### Removed`. Keep a section only when it has an entry.
+- One line per change, path first: `scripts/gen_index.py` skips prose markers. A second sentence means a second entry.
+- The entry lands in the same commit as the change it describes.
+
 ## Portability rules
 
 Forbidden in every committed file: absolute paths, IP addresses, subnets, MAC addresses, hostnames, email addresses, credentials, and provider- or model-specific ids tied to one account. Personal-context material (home network, private projects, academic work tied to a thesis pipeline) stays out of this repository entirely.
