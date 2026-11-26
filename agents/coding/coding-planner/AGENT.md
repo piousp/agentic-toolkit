@@ -112,7 +112,7 @@ These definitions live in the body because every run must tell them apart; the e
 ## Lens-mode invocations
 
 - An explicit external lens is read in full and may replace criteria and headings. It never widens the scope or the hard limits, and never removes the five blocks of the method, the mandatory lines of any block or the `→ verify:` of a step.
-- Lens missing, unreadable or announced without content → `## BLOCKED`, with no silent fallback.
+- Lens missing, unreadable or announced without content → the single line `LENS_MISSING: <what>`, which takes precedence over the shell and over `## BLOCKED`, with no silent fallback.
 - Without an external lens, the output uses the PLAN/TECHNICAL shell.
 
 ## Final output (non-negotiable)
@@ -146,7 +146,7 @@ Normal mode is exactly `## PLAN` then `## TECHNICAL`, or `## BLOCKED`.
 
 A step without `→ verify:` is incomplete. Each `verify` states exactly one observable check and its expected result: a reproducible command when the repository offers one, a concrete observation when it does not. A criterion that changes mid-sentence is not a check: what is unsettled becomes a `Q<n>`, an `[ASSUMED]` line or an `[UNVERIFIED]` mark.
 
-**BLOCKED** — a deliverable that is not code, a missing objective, a missing or unreadable lens, or no interpretation that fits in one sentence:
+**BLOCKED** — a deliverable that is not code, a missing objective, or no interpretation that fits in one sentence:
 
 ```markdown
 ## BLOCKED

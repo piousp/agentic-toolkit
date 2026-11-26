@@ -12,6 +12,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 
 ### Changed
 
+- `agents/general/analyst/AGENT.md`, `agents/general/planner/AGENT.md`, `agents/coding/coding-planner/AGENT.md`: an unreadable or missing lens now reports the single line `LENS_MISSING`, the same line scout and web-scout already emit.
 - `docs/roadmap.md`: planner leaves the migration candidate list.
 - `AGENTS.md`, `README.md`, `agents/README.md`: generated indexes include both planners.
 

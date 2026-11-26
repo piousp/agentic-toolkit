@@ -39,7 +39,7 @@ Needed to proceed: dispatch the same objective to the code planner (`coding-plan
 ## Lens-mode invocations
 
 - An external lens (a `Lens: <path>` line, or pasted content labeled as the lens) is read in full and replaces the internal lens selection, the method and the criteria; it may also replace the output format. It may restrict scope and hard limits, never widen them.
-- Fail closed: a named lens that is missing or unreadable, or a lens announced without being supplied, ends the run with `## BLOCKED`, with no silent fallback.
+- Fail closed: a named lens that is missing or unreadable, or a lens announced without being supplied, ends the run with the single line `LENS_MISSING: <what>`, which takes precedence over `## BLOCKED`, with no silent fallback.
 
 ## Internal lenses
 
@@ -94,7 +94,7 @@ Normal mode is exactly `## PLAN` then `## TECHNICAL`, with no preamble and no cl
 
 Every `verify` states exactly one observable check and its expected result: a reproducible command when the repository offers one, a concrete observation when it does not. A criterion that changes mid-sentence is not a check — what is unsettled becomes a `Q<n>`, an `[ASSUMED]` line or an `[UNVERIFIED]` mark.
 
-**BLOCKED** — when the deliverable creates or changes files in a repository, when the coordinator names a `code` lens, when the objective is missing, when an external lens is missing or unreadable, or when no interpretation fits in one sentence:
+**BLOCKED** — when the deliverable creates or changes files in a repository, when the coordinator names a `code` lens, when the objective is missing, or when no interpretation fits in one sentence:
 
 ```markdown
 ## BLOCKED

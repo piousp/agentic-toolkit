@@ -71,9 +71,7 @@ Evidence applies to substance (path:line, nothing second-hand or invented);
 labels and quotes go only where the lens format has room, without altering its
 headings.
 
-Fail-closed: if a named lens is unreadable or missing, or a lens review is
-announced without one, report exactly what is missing and stop: no default
-review, no Status.
+Fail-closed: if a named lens is unreadable or missing, or a lens review is announced without one, report exactly what is missing and stop: no default review, no Status. That report is the single line `LENS_MISSING: <what>`, the same line every other lens-aware agent in this catalog emits.
 
 ## Rules
 
@@ -110,7 +108,7 @@ review, no Status.
    - Blocking (primary target unreadable or core tool unavailable): stop and
      report the exact error. Default mode: Status BLOCKED. Lens mode: use the
      lens's insufficient-evidence verdict if it has one; otherwise a first
-     line `BLOCKED: <exact error>`.
+     line `LENS_MISSING: <exact error>`.
    - Non-blocking (one of many files missing, empty grep, a single rejected
      call): record NOT_FOUND/PARTIAL in Not covered; in lens mode, in the
      lens's coverage/notes field, or a final line if the format allows it;
