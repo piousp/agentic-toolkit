@@ -62,6 +62,7 @@ tests/run_tests.sh
 ## Index
 
 <!-- GENERATED:BEGIN -->
+- `agents/coding/code-implementer/AGENT.md`
 - `agents/coding/coding-planner/AGENT.md`
 - `agents/general/analyst/AGENT.md`
 - `agents/general/planner/AGENT.md`

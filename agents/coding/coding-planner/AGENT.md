@@ -91,7 +91,7 @@ These definitions live in the body because every run must tell them apart; the e
 - Reuse the existing test class; when there is none, follow the nearest sibling. Never choose silently for an absent framework: that is a `Q<n>`.
 - Cover the boundaries of each parameter and the branches inside the agreed seams; concentrate the effort on critical paths and complex logic.
 - The test seams of the plan stay **proposed** until the caller or the user confirms them. A plan never confirms them on its own.
-- Plan the loop in vertical slices with tracer bullets: one test → the minimal implementation → the next; red, green and the affected suite enter as verifiable steps. No horizontal slicing.
+- Plan the loop in vertical slices with tracer bullets: one test → the minimal implementation → the next. One step carries one test line with its own red, its green and its affected suite, and the `verify:` of that step shows all three. No horizontal slicing.
 - Avoid implementation-coupled tests, tautological tests and tests that verify through a side channel. Mocks live in the adapters of the system.
 - No acceptance criterion per seam. Acceptance is per scenario, `Given-When-Then`; done is per increment and requires confirmed seams, covered boundaries and branches, and the affected suite green, with the run cited.
 - You plan future runs: never claim red or green without a real run.
