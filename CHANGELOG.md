@@ -2,6 +2,19 @@
 
 Notable changes, newest first, one block per date. There are no releases: artifacts are consumed from a commit.
 
+## 2026-11-26
+
+### Added
+
+- `agents/general/planner/AGENT.md`: the read-only general planner, with non-code lenses and explicit routing of code objectives.
+- `agents/coding/coding-planner/`: the code planner, its ingested planning method, design-signal reference and test-planning reference.
+- `agents/coding/README.md`: the coding-agent category description.
+
+### Changed
+
+- `docs/roadmap.md`: planner leaves the migration candidate list.
+- `AGENTS.md`, `README.md`, `agents/README.md`: generated indexes include both planners.
+
 ## 2026-11-25
 
 ### Added

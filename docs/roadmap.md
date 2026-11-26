@@ -14,7 +14,7 @@ Each artifact is reviewed on its own: portability, frontmatter, and whether it s
 
 - Skills about writing and reviewing code: the philosophy, planning, test-first, simplification, refactor, review lenses.
 - Skills about authoring skills.
-- Agents: analyst, planner, worker, scout, web scout, critical thinker.
+- Agents: analyst, worker, scout, web scout, critical thinker.
 
 Exit criterion: the migrated set covers a full review-and-plan workflow with no personal detail.
 
