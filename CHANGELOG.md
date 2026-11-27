@@ -18,6 +18,10 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `scripts/check_repo.py`, `tests/run_tests.sh`: fail on a `summary` longer than an index row.
 - `AGENTS.md`, `docs/conventions.md`: `summary` documented as the human-facing line beside the routing description.
 
+### Fixed
+
+- `skills/coding/pablo-coding-style/SKILL.md`: quote the summary so the YAML frontmatter parses.
+
 ## 2026-11-26
 
 ### Added
