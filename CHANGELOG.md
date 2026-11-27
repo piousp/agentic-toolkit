@@ -40,6 +40,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `docs/refactor-phase.md`: a step's dispatch carries the literal `seam confirmed` line, and `checks` keeps the step suites and the full suite apart.
 - `agents/coding/refactor-planner/AGENT.md`: a disposition names the detected priority, a gate row is never re-adjudicated and a candidate is never discarded here.
 - `agents/coding/refactor-planner/AGENT.md`: the writing set governs a write, the whitelist drops its counting forms and `Surgical Changes` returns to the order.
+- `agents/coding/code-implementer/AGENT.md`: the refactor mode reads each state through the row of its class, a null refactor is read from the structural evidence, and the TDD rules are scoped to `tdd`.
 
 ### Fixed
 
