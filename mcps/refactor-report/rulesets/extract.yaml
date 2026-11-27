@@ -1,0 +1,13 @@
+version: 1
+language: typescript
+rules:
+  - id: http-status-const
+    kind: extract-const
+    description: Hoist one matched string literal into a module-level const.
+    match: { literal: string, value: "200" }
+    params: { name: STATUS_OK }
+  - id: extract-helper
+    kind: extract-module
+    description: Move one top-level value declaration into its own module, re-exported by the origin.
+    match: { declarations: [parseTicket] }
+    params: { target: "./ticket-parse" }

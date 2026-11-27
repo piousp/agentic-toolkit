@@ -1,0 +1,8 @@
+version: 1
+language: typescript
+rules:
+  - id: extract-helper
+    kind: extract-module
+    description: Move one top-level value declaration into its own module, re-exported by the origin.
+    match: { declarations: [parseTicket] }
+    params: { target: "./ticket-parse" }
