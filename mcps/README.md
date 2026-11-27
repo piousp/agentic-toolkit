@@ -10,5 +10,5 @@ server entry, with placeholders only.
 Rules for adding one are in [`../AGENTS.md`](../AGENTS.md).
 
 <!-- GENERATED:BEGIN -->
-_Nothing yet._
+- `mcps/refactor-report/README.md`
 <!-- GENERATED:END -->

@@ -6,6 +6,8 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 
 ### Added
 
+- `mcps/refactor-report/`: the measurement server, which measures a frozen scope and previews a refactor without writing.
+
 - `docs/installation.md`: how to install skills and agents, with the pre-push hook and the overlap check.
 - `tests/fixtures/summary-bad/`: fixture for the summary length check.
 - `skills/*/*/SKILL.md`, `agents/*/*/AGENT.md`: a `summary:` line, the one a human reads in the index tables.
