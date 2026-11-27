@@ -13,6 +13,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 
 ### Changed
 
+- `docs/conventions.md`: self-containment applies to skills only, so an agent may name a skill it declares in `skills:`.
 - `agents/general/analyst/AGENT.md`, `agents/general/planner/AGENT.md`, `agents/coding/code-planner/AGENT.md`: an unreadable or missing lens now reports the single line `LENS_MISSING`, the same line scout and web-scout already emit.
 - `docs/roadmap.md`: planner leaves the migration candidate list.
 - `agents/coding/code-planner/AGENT.md`: the test loop is bound to each step's `verify:` instead of reading red, green and the affected suite as separate steps.
