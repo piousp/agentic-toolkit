@@ -34,6 +34,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 
 - `skills/coding/pablo-coding-style/SKILL.md`: quote the summary so the YAML frontmatter parses.
 - `mcps/refactor-report/src/scope.ts`: a changed file outside the measured languages is named in `skipped` instead of aborting the whole run in diff mode.
+- `scripts/check_links.py`: skip installed dependencies, whose own READMEs link files they do not ship, so the check survives an installed tree.
 - `agents/coding/code-planner/AGENT.md`, `agents/general/planner/AGENT.md`: quote the `summary:` value so the frontmatter parses without lenient recovery.
 
 ## 2026-11-26

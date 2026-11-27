@@ -8,6 +8,8 @@ Ignored: absolute URLs (`http://`, `https://`, `mailto:`), fragments alone,
 site-absolute paths (a leading slash, which depends on a host), and every link
 inside a fenced code block or an inline code span. The fixtures under
 `tests/fixtures/` are skipped by default: they hold broken links on purpose.
+Installed dependencies are skipped too: a package's own README links files the
+package does not ship, and no committed file points there.
 
 Usage:
   scripts/check_links.py [--root PATH]
@@ -69,7 +71,7 @@ def collect(root):
     files = []
     for path in sorted(root.rglob("*.md")):
         relative = path.relative_to(root).as_posix()
-        if relative.startswith(SKIP_PREFIX) or ".git/" in relative:
+        if relative.startswith(SKIP_PREFIX) or ".git/" in relative or "node_modules/" in relative:
             continue
         files.append(path)
     return files
