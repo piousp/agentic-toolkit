@@ -1,10 +1,12 @@
 import { parseArgs } from "node:util";
 
-import { MEASURE_METRICS, MEASURE_VERB } from "./contracts.ts";
-import type { AreaSelector, MeasureMetric, MeasureRequest } from "./contracts.ts";
+import { MEASURE_METRICS, MEASURE_VERB, PREVIEW_VERB } from "./contracts.ts";
+import type { AreaSelector, MeasureMetric, MeasureRequest, PreviewRequest } from "./contracts.ts";
 import { errorBody } from "./errors.ts";
 import { createGit } from "./git.ts";
 import { runMeasure } from "./measure.ts";
+import { PREVIEW_SELECT_IDS, runPreview, selectPreviewAnswer } from "./preview.ts";
+import type { PreviewSelect } from "./preview.ts";
 import { openWorkspace, WorkspaceError } from "./workspace.ts";
 
 // The grammar of the plan, in argv form. Exit 0 carries a report, exit 1 carries a
@@ -15,6 +17,7 @@ export const EXIT_MALFORMED_ARGV = 2;
 
 const USAGE = [
   "usage: node dist/cli.js measure (--diff <base> [--path <p>]... | --area <selector>) [--select <id>[,<id>...]]",
+  "       node dist/cli.js preview --recipe <file>.yaml#sha256:<12> [--rule <id>]... --path <p> [--path <p>]... [--select diff|ranges|delta|all]",
   "  <selector> := function:<path>#<symbol> | class:<path>#<symbol> | module:<path> | repository",
 ].join("\n");
 
@@ -32,6 +35,8 @@ const OPTIONS = {
   path: { type: "string", multiple: true },
   area: { type: "string" },
   select: { type: "string" },
+  recipe: { type: "string" },
+  rule: { type: "string", multiple: true },
 } as const;
 
 type ParsedArguments = {
@@ -39,6 +44,8 @@ type ParsedArguments = {
   readonly path?: readonly string[];
   readonly area?: string;
   readonly select?: string;
+  readonly recipe?: string;
+  readonly rule?: readonly string[];
 };
 
 // Every refusal of the flag parser is a malformed command line: an unknown flag, a
@@ -139,6 +146,13 @@ function areaRequest(
 }
 
 function requestOf(parsed: ParsedArguments): MeasureRequest {
+  // The recipe flags belong to the other verb; measured here, they would be a
+  // selection of rules that quietly did nothing.
+  if (parsed.recipe !== undefined || parsed.rule !== undefined) {
+    throw new MalformedArgument(
+      "--recipe and --rule belong to preview; measure names its scope with --diff or --area",
+    );
+  }
   const selected = selectedMetricsOf(parsed.select);
   if (parsed.diff !== undefined && parsed.area !== undefined) {
     throw new MalformedArgument("the grammar takes one scope mode, and this command names both --diff and --area");
@@ -163,15 +177,66 @@ async function measureToStdout(parsed: ParsedArguments): Promise<void> {
   process.stdout.write(`${JSON.stringify(response)}\n`);
 }
 
-async function main(argv: readonly string[]): Promise<number> {
-  const [verb, ...line] = argv;
-  if (verb !== MEASURE_VERB) {
+// R5/D8: the recipe as the request carries it: the rule set named by the prefix of
+// its content digest, the rules it selects and the files it would touch. A verb's
+// flags on the other verb's command line are one the grammar has no reading for.
+function previewRequestOf(parsed: ParsedArguments): PreviewRequest {
+  if (parsed.diff !== undefined || parsed.area !== undefined) {
     throw new MalformedArgument(
-      `the only verb this entry serves is ${JSON.stringify(MEASURE_VERB)}; this command names ${JSON.stringify(verb ?? null)}`,
+      "--diff and --area belong to measure; preview names its files with --path",
     );
   }
-  await measureToStdout(parseCommandLine(line));
-  return EXIT_OK;
+  if (parsed.recipe === undefined || parsed.recipe === "") {
+    throw new MalformedArgument("preview takes --recipe <file>.yaml#sha256:<12>");
+  }
+  if (parsed.path === undefined || parsed.path.length === 0) {
+    throw new MalformedArgument("preview takes at least one --path");
+  }
+  return {
+    recipe: {
+      ruleset: parsed.recipe,
+      ...(parsed.rule === undefined ? {} : { rules: [...parsed.rule] }),
+    },
+    paths: [...parsed.path],
+  };
+}
+
+// `--select` narrows the printed answer to the value a caller asked the evidence
+// command for; without it the entry prints the whole document.
+function previewSelectOf(select: string | undefined): PreviewSelect {
+  if (select === undefined) {
+    return "all";
+  }
+  const named = PREVIEW_SELECT_IDS.find((candidate) => candidate === select);
+  if (named === undefined) {
+    throw new MalformedArgument(
+      `--select takes ${PREVIEW_SELECT_IDS.join(", ")} for preview; this command names ${JSON.stringify(select)}`,
+    );
+  }
+  return named;
+}
+
+async function previewToStdout(parsed: ParsedArguments): Promise<void> {
+  const request = previewRequestOf(parsed);
+  const select = previewSelectOf(parsed.select);
+  const workspace = await openWorkspace(process.cwd());
+  const response = await runPreview(request, { workspace });
+  process.stdout.write(`${JSON.stringify(selectPreviewAnswer(response, select))}\n`);
+}
+
+async function main(argv: readonly string[]): Promise<number> {
+  const [verb, ...line] = argv;
+  if (verb === MEASURE_VERB) {
+    await measureToStdout(parseCommandLine(line));
+    return EXIT_OK;
+  }
+  if (verb === PREVIEW_VERB) {
+    await previewToStdout(parseCommandLine(line));
+    return EXIT_OK;
+  }
+  throw new MalformedArgument(
+    `this entry serves ${JSON.stringify(MEASURE_VERB)} and ${JSON.stringify(PREVIEW_VERB)}; this command names ${JSON.stringify(verb ?? null)}`,
+  );
 }
 
 // A failure the service named keeps its code: the CLI prints the same body the tool

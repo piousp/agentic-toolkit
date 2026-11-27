@@ -1,7 +1,13 @@
 import { createHash } from "node:crypto";
 import path from "node:path";
 
-import { MEASURE_LANGUAGE, MEASURE_METRICS, MEASURE_METRICSET, MEASURE_VERB } from "./contracts.ts";
+import {
+  commandLine,
+  MEASURE_LANGUAGE,
+  MEASURE_METRICS,
+  MEASURE_METRICSET,
+  MEASURE_VERB,
+} from "./contracts.ts";
 import type {
   AreaSelector,
   MeasureEvidence,
@@ -111,17 +117,6 @@ function scopeArguments(scope: ResolvedScope, filePath: string): string[] {
   return ["--area", `module:${filePath}`];
 }
 
-// A command a caller pastes into a shell, so a token that carries a blank or a quote
-// travels quoted; the rest stays as spelled, which keeps the common command readable.
-const BARE_ARGUMENT = /^[A-Za-z0-9_@%+=:,./#-]+$/;
-
-function quoteArgument(argument: string): string {
-  if (BARE_ARGUMENT.test(argument)) {
-    return argument;
-  }
-  return `'${argument.replaceAll("'", "'\\''")}'`;
-}
-
 // D9/R3: the digest is the sha256 of the bytes the file holds on disk, not of a
 // canonical form of its text, so `sha256sum <file>` prints the same value the gate
 // recomputes from the manifest line "<sha256>  <path>": the caller re-measures the
@@ -154,7 +149,7 @@ function evidenceFor(
   const argv = ["node", "dist/cli.js", "measure", ...scopeArguments(scope, filePath)];
   const evidence: Partial<Record<MeasureMetric, MeasureEvidenceEntry>> = {};
   for (const metric of selected) {
-    evidence[metric] = { command: [...argv, "--select", metric].map(quoteArgument).join(" ") };
+    evidence[metric] = { command: commandLine([...argv, "--select", metric]) };
   }
   return evidence;
 }

@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import type { LineRange } from "./linediff.ts";
 import type { ComplexityUnit, MaxComplexity } from "./metrics.ts";
 import type { SkippedFile } from "./scope.ts";
 
@@ -48,6 +49,22 @@ export type MeasureRequest = {
 
 // R4: every reported number travels with the argv that reproduces it.
 export type MeasureEvidenceEntry = { readonly command: string };
+
+// R4/D8: an evidence command is a line a caller pastes into a shell, so a token that
+// carries a blank or a quote travels quoted and every other token keeps the spelling
+// it had. Both verbs spell their evidence this way, so one helper spells it.
+const BARE_ARGUMENT = /^[A-Za-z0-9_@%+=:,./#-]+$/;
+
+function quoteArgument(argument: string): string {
+  if (BARE_ARGUMENT.test(argument)) {
+    return argument;
+  }
+  return `'${argument.replaceAll("'", "'\\''")}'`;
+}
+
+export function commandLine(tokens: readonly string[]): string {
+  return tokens.map(quoteArgument).join(" ");
+}
 
 // `select` narrows what the answer reports, so a metric the request did not ask
 // for is absent instead of zero: a zero that was never measured is a number the
@@ -125,3 +142,78 @@ export const measureRequestSchema = z.strictObject({
   scope: measureScopeSchema,
   select: z.array(z.enum([...MEASURE_METRICS])).optional(),
 });
+
+// R5: the recipe grammar the contract fixes for `preview`. It travels here with the
+// service it describes: a published rule set, named by the prefix of its content
+// digest, and the rules of that set the recipe selects.
+const RECIPE_REFERENCE = /^[a-z0-9][a-z0-9-]*\.yaml#sha256:[0-9a-f]{12}$/;
+
+export const previewRequestSchema = z.strictObject({
+  recipe: z.strictObject({
+    ruleset: z.string().regex(RECIPE_REFERENCE),
+    rules: z.array(z.string()).optional(),
+  }),
+  paths: z.array(z.string()),
+});
+
+export const PREVIEW_VERB = "preview";
+
+export type PreviewRecipe = {
+  readonly ruleset: string;
+  readonly rules?: readonly string[];
+};
+
+export type PreviewRequest = {
+  readonly recipe: PreviewRecipe;
+  readonly paths: readonly string[];
+};
+
+// The delta a preview reports is the difference an applied recipe would make, so a
+// negative number is a metric the change reduces and a zero is a metric it leaves.
+export type PreviewDelta = {
+  readonly loc: number;
+  readonly functions: number;
+  readonly max_complexity: number;
+  readonly importers: number;
+};
+
+export type PreviewEvidence = {
+  readonly diff: MeasureEvidenceEntry;
+  readonly delta: MeasureEvidenceEntry;
+};
+
+// R5: an origin the recipe edits is `modified`; a module the recipe would create is
+// `created`, and its ranges and delta are read against the empty text it holds now.
+export type PreviewFileEntry = {
+  readonly path: string;
+  readonly status: "modified" | "created";
+  readonly ranges: readonly LineRange[];
+  readonly diff: string;
+  readonly delta: PreviewDelta;
+  readonly evidence: PreviewEvidence;
+};
+
+export type PreviewRulesetSummary = {
+  readonly name: string;
+  readonly ruleset_digest: string;
+  readonly rules: readonly string[];
+};
+
+export type PreviewDocumentEvidence = {
+  readonly ruleset_digest: MeasureEvidenceEntry;
+  readonly change_digest: MeasureEvidenceEntry;
+};
+
+// `applied` is the literal false: the service holds no code path that writes to the
+// tree, and the answer says so in the type as well as in the value.
+export type PreviewResponse = {
+  readonly verb: typeof PREVIEW_VERB;
+  readonly applied: false;
+  readonly language: typeof MEASURE_LANGUAGE;
+  readonly metricset: string;
+  readonly ruleset: PreviewRulesetSummary;
+  readonly change_digest: string;
+  readonly paths: readonly string[];
+  readonly files: readonly PreviewFileEntry[];
+  readonly evidence: PreviewDocumentEvidence;
+};
