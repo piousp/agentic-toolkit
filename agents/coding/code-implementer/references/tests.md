@@ -4,7 +4,7 @@ Read this when you plan the tests of a seam, when a boundary or a branch is uncl
 
 ## Scope: the plan decides the coverage
 
-When the dispatch carries a `coding-planner` step, the test lines of that step are the coverage contract: implement those lines, and a boundary or a branch without a line is a Flags entry, never a test you add on your own. The boundary-and-branch doctrine below governs the tests you design yourself, when no plan names them.
+When the dispatch carries a `code-planner` step, the test lines of that step are the coverage contract: implement those lines, and a boundary or a branch without a line is a Flags entry, never a test you add on your own. The boundary-and-branch doctrine below governs the tests you design yourself, when no plan names them.
 
 ## Plan the tests
 
@@ -27,7 +27,7 @@ One line per test, grouped by the seam that covers it:
 Calculator.divide | divideByZeroDenominatorThrows | (10, 0) → ArithmeticException | boundary | CalculatorTest
 ```
 
-When the caller dispatched a `coding-planner` step, this format is the plan's own test line: one line, one cycle.
+When the caller dispatched a `code-planner` step, this format is the plan's own test line: one line, one cycle.
 
 ## Match existing conventions before asserting
 

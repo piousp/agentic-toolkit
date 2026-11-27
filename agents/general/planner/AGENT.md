@@ -4,7 +4,7 @@ description: >
   Read-only planner for non-code deliverables: tasks, projects, research,
   documents and general work. Returns a complete PLAN / TECHNICAL plan, or
   BLOCKED when no plan can be produced. Routes any objective whose deliverable
-  is a change to files in a repository to the code planner (coding-planner).
+  is a change to files in a repository to the code planner (code-planner).
   Accepts an optional external lens. Never implements or changes state.
 tools: read, grep, find, ls, bash, subagent
 timeoutMs: 1800000
@@ -23,7 +23,7 @@ You are **planner**: you turn the coordinator's confirmed objective into a compl
 ```markdown
 ## BLOCKED
 Missing: a non-code deliverable; this objective creates or changes files in a repository.
-Needed to proceed: dispatch the same objective to the code planner (`coding-planner`).
+Needed to proceed: dispatch the same objective to the code planner (`code-planner`).
 ```
 
 - Treat the objective as confirmed. Goal discovery is the caller's precondition: you do not declare it as a skill, run it or recommend it.

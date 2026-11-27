@@ -7,15 +7,18 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 ### Added
 
 - `agents/general/planner/AGENT.md`: the read-only general planner, with non-code lenses and explicit routing of code objectives.
-- `agents/coding/coding-planner/`: the code planner, its ingested planning method, design-signal reference and test-planning reference.
+- `agents/coding/code-planner/`: the code planner, its ingested planning method, design-signal reference and test-planning reference.
 - `agents/coding/README.md`: the coding-agent category description.
 - `agents/coding/code-implementer/`: the implementer of one planned step, with the seam contract, the S0-S7 TDD state machine and the test and mocking references absorbed from the retired test-first skill.
 
 ### Changed
 
-- `agents/general/analyst/AGENT.md`, `agents/general/planner/AGENT.md`, `agents/coding/coding-planner/AGENT.md`: an unreadable or missing lens now reports the single line `LENS_MISSING`, the same line scout and web-scout already emit.
+- `agents/general/analyst/AGENT.md`, `agents/general/planner/AGENT.md`, `agents/coding/code-planner/AGENT.md`: an unreadable or missing lens now reports the single line `LENS_MISSING`, the same line scout and web-scout already emit.
 - `docs/roadmap.md`: planner leaves the migration candidate list.
-- `agents/coding/coding-planner/AGENT.md`: the test loop is bound to each step's `verify:` instead of reading red, green and the affected suite as separate steps.
+- `agents/coding/code-planner/AGENT.md`: the test loop is bound to each step's `verify:` instead of reading red, green and the affected suite as separate steps.
+- `agents/coding/code-planner/AGENT.md`, `agents/coding/code-implementer/AGENT.md`: the step format carries the test seam, which the planner emitted and its contract did not declare.
+- `agents/coding/code-planner/`: renamed from `coding-planner`, so the name states what it plans.
+- `agents/README.md`: a diagram of the planner-to-implementer handoff.
 - `AGENTS.md`, `README.md`, `agents/README.md`: generated indexes include both planners and the code implementer.
 
 ## 2026-11-25
