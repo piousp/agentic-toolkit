@@ -230,3 +230,120 @@ it("refuses diff paths in an area request", async (t) => {
 
   await assert.rejects(() => runMeasure(request, deps), { code: "SCOPE_INVALID" });
 });
+
+const CONTENT_FIXTURE_ROOT = path.join(import.meta.dirname, "fixtures", "measure");
+
+// R3: the digest is the one the gate recomputes from the manifest line
+// "<sha256>  <path>", so the number is checkable with sha256sum and never needs the
+// server to be believed about its own answer.
+it("digests a file with the sha256 of its bytes so sha256sum reproduces the manifest", async () => {
+  const workspace = await openWorkspace(CONTENT_FIXTURE_ROOT);
+
+  const result = await runMeasure(
+    { scope: { mode: "area", area: { kind: "repository" } }, select: ["sha256"] },
+    { workspace, git: createGit(workspace) },
+  );
+
+  const [file] = result.files;
+  assert.ok(file !== undefined);
+  assert.equal(file.path, "content.ts");
+  // sha256sum test/fixtures/measure/content.ts, computed with sha256sum from the
+  // fixture bytes, never printed by the implementation.
+  assert.equal(file.sha256, "6e744a688b8d540f55a69fd6bb851b19590d72d0a618fc6464ad77e03194a443");
+});
+
+// D9: a tree above the ceiling is refused instead of measured in part, and the
+// refusal lands before the first read so no partial report can reach the caller.
+it("refuses a tree above the file limit before reading a single file", async (t) => {
+  const root = await makeRoot(t, {
+    "src/a.ts": "export const a = 1;\n",
+    "src/b.ts": "export const b = 2;\n",
+  });
+  const workspace = await openWorkspace(root);
+  const read: string[] = [];
+  const counting: Workspace = {
+    root: workspace.root,
+    listFiles: () => workspace.listFiles(),
+    readText: async (relative) => {
+      read.push(relative);
+      return workspace.readText(relative);
+    },
+  };
+
+  await assert.rejects(
+    () =>
+      runMeasure(
+        { scope: { mode: "area", area: { kind: "repository" } } },
+        { workspace: counting, git: createGit(workspace), maxFiles: 1 },
+      ),
+    (error: WorkspaceError) => {
+      assert.equal(error.code, "FILES_OVER_LIMIT");
+      return true;
+    },
+  );
+
+  assert.deepEqual(read, []);
+});
+
+const UNITS_SOURCE = [
+  "export class Ticket {",
+  "  status(): number {",
+  "    return 200;",
+  "  }",
+  "}",
+  "",
+  "export function parseTicket(raw: string): number {",
+  '  if (raw === "") {',
+  "    return 0;",
+  "  }",
+  "  return 1;",
+  "}",
+  "",
+].join("\n");
+
+// R3: the per-unit breakdown is the answer a symbol selector asks for, so it is
+// reported there and in no other granularity: a module or repository report carries
+// the file metrics without a list the caller would have to filter itself.
+it("reports the measured units in symbol granularity and in no other", async (t) => {
+  const root = await makeRoot(t, { "src/ticket.ts": UNITS_SOURCE });
+  const deps = await depsOf(root);
+  const units = [
+    { name: "status", start_line: 2, complexity: 1 },
+    { name: "parseTicket", start_line: 7, complexity: 2 },
+  ];
+
+  const byFunction = await runMeasure(
+    {
+      scope: {
+        mode: "area",
+        area: { kind: "function", path: "src/ticket.ts", symbol: "parseTicket" },
+      },
+    },
+    deps,
+  );
+  assert.deepEqual(byFunction.files[0]?.units, units);
+
+  const byClass = await runMeasure(
+    { scope: { mode: "area", area: { kind: "class", path: "src/ticket.ts", symbol: "Ticket" } } },
+    deps,
+  );
+  assert.deepEqual(byClass.files[0]?.units, units);
+
+  const byModule = await runMeasure(
+    { scope: { mode: "area", area: { kind: "module", path: "src" } } },
+    deps,
+  );
+  assert.deepEqual(
+    byModule.files.map((file) => "units" in file),
+    [false],
+  );
+
+  const byRepository = await runMeasure(
+    { scope: { mode: "area", area: { kind: "repository" } } },
+    deps,
+  );
+  assert.deepEqual(
+    byRepository.files.map((file) => "units" in file),
+    [false],
+  );
+});

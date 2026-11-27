@@ -62,6 +62,9 @@ export type MeasureFileEntry = {
   readonly functions?: number;
   readonly max_complexity?: MaxComplexity;
   readonly importers?: number;
+  // R3: the per-unit breakdown travels only in the function and class
+  // granularities, where the selector named the units; module and repository omit
+  // the key instead of reporting an empty list.
   readonly units?: readonly ComplexityUnit[];
   readonly evidence: MeasureEvidence;
 };

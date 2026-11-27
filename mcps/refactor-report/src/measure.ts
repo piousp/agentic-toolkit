@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import path from "node:path";
 
 import { MEASURE_LANGUAGE, MEASURE_METRICS, MEASURE_METRICSET, MEASURE_VERB } from "./contracts.ts";
@@ -11,7 +12,6 @@ import type {
   MeasureResponse,
   MeasureScopeSummary,
 } from "./contracts.ts";
-import { canonicalDigest } from "./digest.ts";
 import type { Git } from "./git.ts";
 import { buildImportGraph } from "./imports.ts";
 import { measureFile } from "./metrics.ts";
@@ -28,6 +28,9 @@ export const MEASURE_MAX_FILES = 2000;
 export type MeasureDeps = {
   readonly workspace: Workspace;
   readonly git: Git;
+  // D9: the ceiling is a dependency so a case can pin it with a small number;
+  // the default is the limit the plan fixed and the one a real run applies.
+  readonly maxFiles?: number;
 };
 
 type ResolvedScope = ResolvedDiffScope | ResolvedAreaScope;
@@ -113,6 +116,15 @@ function scopeArguments(scope: ResolvedScope): string[] {
   return ["--area", "repository"];
 }
 
+// D9/R3: the digest is the sha256 of the bytes the file holds on disk, not of a
+// canonical form of its text, so `sha256sum <file>` prints the same value the gate
+// recomputes from the manifest line "<sha256>  <path>": the caller re-measures the
+// tree without believing this server. A text file is measured as the utf8 bytes the
+// workspace read, which are the bytes on disk for every source file it reads.
+function contentDigest(text: string): string {
+  return createHash("sha256").update(text, "utf8").digest("hex");
+}
+
 // R3: `select` is a projection of the report, so a request without it keeps the
 // whole vocabulary and a request with it keeps exactly the metrics it names, in
 // the order the vocabulary fixes.
@@ -144,6 +156,16 @@ function evidenceFor(
   return evidence;
 }
 
+// R3: the per-unit breakdown belongs to a symbol selector, which asked for one
+// file's units; the module and repository granularities report the file metrics and
+// no list the caller would have to reduce to a number itself.
+function reportsUnits(scope: ResolvedScope): boolean {
+  if (scope.mode !== "area") {
+    return false;
+  }
+  return scope.area.kind === "function" || scope.area.kind === "class";
+}
+
 // One file entry of the answer, with the metrics the request selected and no
 // others: an absent key says "not reported", where a zero would say "measured".
 function fileEntryOf(
@@ -157,13 +179,25 @@ function fileEntryOf(
   const wanted = (metric: MeasureMetric): boolean => selected.includes(metric);
   return {
     path: filePath,
-    ...(wanted("sha256") ? { sha256: canonicalDigest(text) } : {}),
+    ...(wanted("sha256") ? { sha256: contentDigest(text) } : {}),
     ...(wanted("loc") ? { loc: measured.loc } : {}),
     ...(wanted("functions") ? { functions: measured.functions } : {}),
     ...(wanted("max_complexity") ? { max_complexity: measured.max_complexity } : {}),
     ...(wanted("importers") ? { importers } : {}),
+    ...(reportsUnits(scope) ? { units: measured.units } : {}),
     evidence: evidenceFor(scope, filePath, selected),
   };
+}
+
+// D9: the ceiling fails closed. A tree above it is refused, never measured in part:
+// the caller re-measures the tree itself and a truncated report would look complete.
+function assertWithinFileLimit(measured: number, limit: number): void {
+  if (measured > limit) {
+    throw new WorkspaceError(
+      "FILES_OVER_LIMIT",
+      `the scope resolved ${measured} files; the limit is ${limit}, and a larger tree is refused instead of truncated`,
+    );
+  }
 }
 
 export async function runMeasure(
@@ -171,6 +205,8 @@ export async function runMeasure(
   deps: MeasureDeps,
 ): Promise<MeasureResponse> {
   const scope = await resolveScope(request, deps);
+  // Before the graph and before the first read: nothing is measured above the limit.
+  assertWithinFileLimit(scope.files.length, deps.maxFiles ?? MEASURE_MAX_FILES);
   const graph = await buildImportGraph(deps.workspace);
   const selected = selectedMetrics(request);
 
