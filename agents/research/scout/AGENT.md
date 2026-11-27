@@ -6,6 +6,7 @@ description: >
   Returns compressed findings (file paths, line numbers, excerpts) to the
   caller. Accepts an optional lens (`Lens: <path>` or pasted content
   explicitly labeled as the lens) that replaces the default output format.
+summary: Finds files, symbols and references in a codebase, without analyzing them.
 tools: read, grep, find, ls, codemode
 systemPromptMode: append
 inheritProjectContext: false

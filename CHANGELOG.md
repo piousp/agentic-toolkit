@@ -2,6 +2,22 @@
 
 Notable changes, newest first, one block per date. There are no releases: artifacts are consumed from a commit.
 
+## 2026-11-27
+
+### Added
+
+- `docs/installation.md`: how to install skills and agents, with the pre-push hook and the overlap check.
+- `tests/fixtures/summary-bad/`: fixture for the summary length check.
+- `skills/*/*/SKILL.md`, `agents/*/*/AGENT.md`: a `summary:` line, the one a human reads in the index tables.
+
+### Changed
+
+- `README.md`: what the toolkit is and who it is for, without install commands or the check list.
+- `agents/README.md`, `skills/README.md`, `mcps/README.md`, `harness/README.md`, `agents/*/README.md`, `skills/*/README.md`: written for a human reader, with the how-to details moved to `docs/installation.md`.
+- `scripts/gen_index.py`: the index tables show each artifact's `summary:`, falling back to the first sentence of `description`.
+- `scripts/check_repo.py`, `tests/run_tests.sh`: fail on a `summary` longer than an index row.
+- `AGENTS.md`, `docs/conventions.md`: `summary` documented as the human-facing line beside the routing description.
+
 ## 2026-11-26
 
 ### Added

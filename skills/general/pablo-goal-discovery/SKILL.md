@@ -10,6 +10,7 @@ description: >
   [DO NOT] trigger when a confirmed goal.md already exists for this work, or
   when the task does not need goal discovery (the ask is already clear and
   scoped, or is pure implementation/planning work).
+summary: Turns a vague ask into a confirmed goal through numbered decisions.
 ---
 
 # pablo-goal-discovery

@@ -5,6 +5,7 @@ description: >
   pi exports. Use when a skill must write run artifacts next to the session, or
   when a session path has to be reported. [DO NOT] use to list past sessions, to
   read transcripts, or outside a pi session.
+summary: Finds the current pi session directory so run artifacts land beside it.
 ---
 
 # find-pi-session

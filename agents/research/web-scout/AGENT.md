@@ -1,6 +1,7 @@
 ---
 name: web-scout
 description: "Fast web searcher: one batched search, up to two fetched sources, URL and verbatim quote per claim; accepts an optional lens file for structured multi-source output"
+summary: Searches the web and returns a URL and a quote for each claim.
 tools: web_enable, web_search, fetch_content, get_search_content, read
 maxTurns: 20
 systemPromptMode: replace

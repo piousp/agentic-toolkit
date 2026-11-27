@@ -6,6 +6,7 @@ description: >
   prose. Use before drafting or revising any piece of writing. Do NOT use
   to detect or judge AI-written text; this skill produces writing, it does
   not run a review pipeline.
+summary: Rewrites a text so it reads as written by a person, in any genre.
 ---
 
 # Humanize Text

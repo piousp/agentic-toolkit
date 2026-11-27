@@ -8,6 +8,7 @@ description: >
   pablo-coding-style skill for its decision principles. Routes non-code
   deliverables to the general planner (planner). Never implements or changes
   state.
+summary: Plans a change to code: decisions, contracts, test seams, ordered steps.
 tools: read, grep, find, ls, bash, subagent
 timeoutMs: 1800000
 systemPromptMode: replace

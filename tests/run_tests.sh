@@ -30,6 +30,7 @@ expect() {
 
 expect "check_repo accepts valid fixtures" 0 python3 scripts/check_repo.py --root "$FIX/valid"
 expect "check_repo rejects broken fixtures" 1 python3 scripts/check_repo.py --root "$FIX/invalid"
+expect "check_repo rejects a summary too long for the index" 1 python3 scripts/check_repo.py --root "$FIX/summary-bad"
 expect "check_portability rejects violations" 1 scripts/check_portability.sh "$FIX/pii/sample.txt"
 expect "check_portability accepts a clean file" 0 scripts/check_portability.sh "$FIX/clean.txt"
 expect "check_portability accepts the repository" 0 scripts/check_portability.sh

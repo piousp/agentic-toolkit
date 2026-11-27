@@ -1,15 +1,14 @@
 # Agents
 
-Each agent is a directory with an `AGENT.md`: a subagent a harness runs with its own prompt, tools and turn limits. Categories group agents by domain; the category is navigation, the name is identity.
+An agent is a directory with an `AGENT.md`: a prompt a harness runs as its own
+worker, with tools, turn limits and a model. The category groups agents by
+domain and never changes what one can do. The name in the frontmatter is what a
+harness matches.
 
-Because harnesses read agents one directory level deep, a category layout needs one flattening step. `scripts/link_agents.sh` links every agent into the harness directory and never deletes anything:
-
-```sh
-scripts/link_agents.sh --dry-run
-scripts/link_agents.sh
-```
-
-Rules for adding one are in `AGENTS.md`.
+Each agent here states its contract: what it returns, what it must not touch,
+where its evidence comes from. The planner stops at a plan, the implementer at
+one step, the scout at findings. A reader can tell from the file what a run
+will produce, before running it.
 
 ## How a plan reaches an implementer
 
@@ -26,15 +25,20 @@ flowchart TD
     G -- "no" --> H["Commit, or the next objective"]
 ```
 
-The planner never confirms its own seams and the implementer never reopens the plan, so the confirmation is the only decision the caller makes.
+The planner never confirms its own seams and the implementer never reopens the
+plan, so the caller makes the only decision in the loop: confirming the seams.
+
+To install an agent into a harness, see [`../docs/installation.md`](../docs/installation.md).
+The list below is generated from each `AGENT.md`; rules for adding one are in
+[`../AGENTS.md`](../AGENTS.md).
 
 <!-- GENERATED:BEGIN -->
 | Agent | Category | What it does |
 |---|---|---|
-| [`code-implementer`](./coding/code-implementer/AGENT.md) | `coding` | Implements one step of a code-planner plan, or one caller-named seam, through a fixed S0-S7 TDD state machine: one test at a time, red then green, the affect... |
-| [`code-planner`](./coding/code-planner/AGENT.md) | `coding` | Read-only planner for objectives whose deliverable is a change to files in a code repository. Produces a complete PLAN / TECHNICAL implementation plan with r... |
-| [`analyst`](./general/analyst/AGENT.md) | `general` | General-purpose analyst for code reviews, document audits, research and any investigation. Measures artifacts against explicit criteria with labeled evidence... |
-| [`planner`](./general/planner/AGENT.md) | `general` | Read-only planner for non-code deliverables: tasks, projects, research, documents and general work. Returns a complete PLAN / TECHNICAL plan, or BLOCKED when... |
-| [`scout`](./research/scout/AGENT.md) | `research` | Fast codebase recon: finds files, symbols, patterns, and references. No analysis, no evaluation, no implementation. Returns compressed findings (file paths,... |
-| [`web-scout`](./research/web-scout/AGENT.md) | `research` | Fast web searcher: one batched search, up to two fetched sources, URL and verbatim quote per claim; accepts an optional lens file for structured multi-source... |
+| [`code-implementer`](./coding/code-implementer/AGENT.md) | `coding` | Implements one planned step, test first, and reports the evidence. |
+| [`code-planner`](./coding/code-planner/AGENT.md) | `coding` | Plans a change to code: decisions, contracts, test seams, ordered steps. |
+| [`analyst`](./general/analyst/AGENT.md) | `general` | Reviews an artifact against explicit criteria and labels every claim. |
+| [`planner`](./general/planner/AGENT.md) | `general` | Plans non-code work: tasks, projects, research, documents, writing. |
+| [`scout`](./research/scout/AGENT.md) | `research` | Finds files, symbols and references in a codebase, without analyzing them. |
+| [`web-scout`](./research/web-scout/AGENT.md) | `research` | Searches the web and returns a URL and a quote for each claim. |
 <!-- GENERATED:END -->

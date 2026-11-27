@@ -2,6 +2,7 @@
 name: pablo-coding-style
 description: >-
   Pablo's coding style and the principles behind it: YAGNI, then KISS, then DRY, then SOLID, plus FP, GoF and small surgical changes. Use when writing, editing or refactoring code, or when another skill loads or cites it as its principle source. [DO NOT] trigger on its own for prose, docs, planning, test design, "simplify this" or "clean this up" requests that ask for a plan rather than the edit, or vague requests.
+summary: The rules behind the code: YAGNI, KISS, DRY, SOLID, and small surgical edits.
 ---
 
 # Coding Style

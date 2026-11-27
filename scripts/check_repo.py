@@ -19,6 +19,7 @@ FIELD_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*):(.*)$")
 SKILL_REF_RE = re.compile(r"skill:([a-z0-9][a-z0-9-]*)")
 BLOCK_MARKERS = {">", "|", ">-", "|-", ">+", "|+"}
 MIN_DESCRIPTION = 20
+MAX_SUMMARY = 100
 
 
 def parse_frontmatter(text):
@@ -94,6 +95,7 @@ def validate(kind, paths, root, skill_names):
 
         name = fields.get("name", "")
         description = fields.get("description", "")
+        summary = fields.get("summary", "")
 
         if not name:
             errors.append(f"{label}: missing name")
@@ -109,6 +111,11 @@ def validate(kind, paths, root, skill_names):
         elif len(description) < MIN_DESCRIPTION:
             errors.append(
                 f"{label}: description too short to route on ({len(description)} chars)"
+            )
+
+        if summary and len(summary) > MAX_SUMMARY:
+            errors.append(
+                f"{label}: summary too long for an index row ({len(summary)} chars, max {MAX_SUMMARY})"
             )
 
         if kind == "agent":

@@ -9,6 +9,7 @@ description: >
   pablo-coding-style skill for its decision principles. [DO NOT] use for
   read-only analysis, recon, planning, a refactor as an objective of its own, or
   a step with no named target file, behavior and test seam.
+summary: Implements one planned step, test first, and reports the evidence.
 tools: read, grep, find, ls, write, edit, bash, codemode
 disallowedTools: subagent
 systemPromptMode: replace

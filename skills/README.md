@@ -1,21 +1,24 @@
 # Skills
 
-Each skill is a directory with a `SKILL.md`: a set of instructions a harness advertises by name and description, and loads only when the task calls for it.
+A skill is a directory with a `SKILL.md`: instructions a harness advertises by
+name and description, and loads only when the task calls for it. That delayed
+load explains why a description here reads like a routing rule and not like a
+title.
 
-Link a category into a harness to install every skill it holds:
+Skills in this repository come in two sizes. Some state the principles that
+decide what an artifact should look like; others walk a procedure from the
+first step to the last. Both are invoked the same way, by name.
 
-```sh
-ln -s "$PWD/skills/<category>" "$HOME/.pi/agent/skills/<category>"
-```
-
-Rules for adding one are in `AGENTS.md`.
+To install one, see [`../docs/installation.md`](../docs/installation.md). The
+list below is generated from each `SKILL.md`; rules for adding one are in
+[`../AGENTS.md`](../AGENTS.md).
 
 <!-- GENERATED:BEGIN -->
 | Skill | Category | What it does |
 |---|---|---|
-| [`pablo-coding-style`](./coding/pablo-coding-style/SKILL.md) | `coding` | Pablo's coding style and the principles behind it: YAGNI, then KISS, then DRY, then SOLID, plus FP, GoF and small surgical changes. Use when writing, editing... |
-| [`pablo-goal-discovery`](./general/pablo-goal-discovery/SKILL.md) | `general` | Use when a vague or under-specified ask must become a confirmed goal before work begins. Runs the mattpocock grilling interview: rounds of numbered decisions... |
-| [`writing-agent-skills`](./general/writing-agent-skills/SKILL.md) | `general` | Use when authoring, reviewing or refurbishing an agent Skill: writing SKILL.md frontmatter and body, structuring the scripts/references/assets folders, tight... |
-| [`find-pi-session`](./pi-tooling/find-pi-session/SKILL.md) | `pi-tooling` | Locate the current pi session and its artifact directory from the variables pi exports. Use when a skill must write run artifacts next to the session, or whe... |
-| [`pablo-humanize-text`](./writing/pablo-humanize-text/SKILL.md) | `writing` | Write or rewrite any text so it reads as naturally human, in any genre: code comments, PR reviews, summaries, text edits, emails, and academic prose. Use bef... |
+| [`pablo-coding-style`](./coding/pablo-coding-style/SKILL.md) | `coding` | The rules behind the code: YAGNI, KISS, DRY, SOLID, and small surgical edits. |
+| [`pablo-goal-discovery`](./general/pablo-goal-discovery/SKILL.md) | `general` | Turns a vague ask into a confirmed goal through numbered decisions. |
+| [`writing-agent-skills`](./general/writing-agent-skills/SKILL.md) | `general` | How to write, tighten and retire an agent skill, from frontmatter to tests. |
+| [`find-pi-session`](./pi-tooling/find-pi-session/SKILL.md) | `pi-tooling` | Finds the current pi session directory so run artifacts land beside it. |
+| [`pablo-humanize-text`](./writing/pablo-humanize-text/SKILL.md) | `writing` | Rewrites a text so it reads as written by a person, in any genre. |
 <!-- GENERATED:END -->

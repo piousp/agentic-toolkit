@@ -6,6 +6,7 @@ description: >
   tightening a trigger description, shrinking a skill that grew too long, or
   deciding whether to keep, fix or retire a skill. [DO NOT] trigger for general
   coding, prose writing, non-skill documentation or a skill's own test suite.
+summary: How to write, tighten and retire an agent skill, from frontmatter to tests.
 ---
 
 # Writing Agent Skills

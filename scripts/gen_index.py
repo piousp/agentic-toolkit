@@ -18,6 +18,7 @@ END = "<!-- GENERATED:END -->"
 BEGIN_LINE = re.compile(r"^" + re.escape(BEGIN) + r"[ \t]*$", re.MULTILINE)
 END_LINE = re.compile(r"^" + re.escape(END) + r"[ \t]*$", re.MULTILINE)
 MAX_DESCRIPTION = 160
+MAX_SUMMARY = 100
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -34,7 +35,7 @@ def collect(root):
                 {
                     "name": fields.get("name") or path.parent.name,
                     "category": path.parent.parent.name,
-                    "description": clean(fields.get("description", "")),
+                    "summary": summarize(fields),
                 }
             )
     # MCP servers carry no frontmatter: the directory name is the identity and
@@ -44,11 +45,25 @@ def collect(root):
     return entries
 
 
-def clean(text):
+def clean(text, limit=MAX_DESCRIPTION):
     text = " ".join(text.split()).replace("|", "\\|")
-    if len(text) > MAX_DESCRIPTION:
-        text = text[: MAX_DESCRIPTION - 3].rstrip() + "..."
+    if len(text) > limit:
+        text = text[: limit - 3].rstrip() + "..."
     return text or "-"
+
+
+def summarize(fields):
+    """Return the line a human reads in the index tables.
+
+    `summary` is written for a reader. When it is missing, the first sentence
+    of `description` stands in: that field is written to route a model, so the
+    fallback is a degraded answer, never the preferred one.
+    """
+    summary = clean(fields.get("summary", ""), MAX_SUMMARY)
+    if summary != "-":
+        return summary
+    first = re.split(r"(?<=[.!?])\s+", fields.get("description", ""), maxsplit=1)[0]
+    return clean(first, MAX_SUMMARY)
 
 
 def table(headers, rows):
@@ -75,7 +90,7 @@ def render_overview(entries):
 
 def render_skills(entries):
     rows = [
-        [f"[`{e['name']}`](./{e['category']}/{e['name']}/SKILL.md)", f"`{e['category']}`", e["description"]]
+        [f"[`{e['name']}`](./{e['category']}/{e['name']}/SKILL.md)", f"`{e['category']}`", e["summary"]]
         for e in entries["skill"]
     ]
     return table(["Skill", "Category", "What it does"], rows) + "\n"
@@ -83,7 +98,7 @@ def render_skills(entries):
 
 def render_agents(entries):
     rows = [
-        [f"[`{e['name']}`](./{e['category']}/{e['name']}/AGENT.md)", f"`{e['category']}`", e["description"]]
+        [f"[`{e['name']}`](./{e['category']}/{e['name']}/AGENT.md)", f"`{e['category']}`", e["summary"]]
         for e in entries["agent"]
     ]
     return table(["Agent", "Category", "What it does"], rows) + "\n"

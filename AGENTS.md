@@ -17,6 +17,7 @@ A public, opinionated collection of skills, agents and MCP servers. Portability 
 ## Frontmatter rules
 
 - `name` and `description` are required. `name` equals the directory name.
+- `summary` is optional and written for a human, not for routing: one line, at most 100 characters, what the artifact does. The tables use it and fall back to the first sentence of `description` when it is missing.
 - Names are unique per kind (a skill and an agent may share a name).
 - The category lives in the path, not in the frontmatter.
 - An agent that declares `skills:` may only name skills this repository publishes. Each such dependency is a deliberate choice: prefer a self-contained agent, and when an agent must depend on a skill, make the dependency visible in its description.

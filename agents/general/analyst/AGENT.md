@@ -9,6 +9,7 @@ description: >
   skill name) whose format replaces its default report. No write/edit, no
   project-specific context. Use for independent reviews without risk of
   modification.
+summary: Reviews an artifact against explicit criteria and labels every claim.
 tools: read, bash, grep, find, ls, subagent, codemode
 timeoutMs: 1800000
 systemPromptMode: append

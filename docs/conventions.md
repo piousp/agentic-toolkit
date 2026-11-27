@@ -28,6 +28,8 @@ A category is created with its first artifact, never before. It is a navigation 
 
 Required everywhere: `name`, `description`. The description carries the routing decision: what the artifact does and when it applies. A description that only says "helps with X" gives the model nothing to route on.
 
+`summary` is the other audience. It is optional, one line of at most 100 characters, and written for a person reading the index: what the artifact does, with the routing detail left out. `scripts/gen_index.py` prints it and falls back to the first sentence of `description` when it is absent, so the routing text never has to double as a list entry. `scripts/check_repo.py` fails on a summary that overflows the row.
+
 Harness fields follow the reference harness and are documented in the artifact when their effect is not obvious. One rule is local to this repository: `model:` is not committed. A model id belongs to an account and a budget, not to an artifact.
 
 ## Dependencies
