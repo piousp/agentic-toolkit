@@ -73,8 +73,8 @@ parameterises them, and no threshold, verdict or priority lives in either.
 | Script | What it does |
 |---|---|
 | `npm test` | Runs the unit tests on `node --test`, with no build step. |
-| `npm run test:protocol` | Builds and speaks the protocol to `dist/index.js` over stdio: initialize, `tools/list`, one call. |
-| `npm run test:cli` | Builds and replays each `evidence` command of a `measure` answer, comparing the printed value. |
+| `npm run test:protocol` | Builds and speaks the protocol to `dist/index.js` over stdio: initialize, `tools/list`, and the `tools/call` refusals the schema and the service name. |
+| `npm run test:cli` | Builds and replays each `evidence` command of a `measure` and of a `preview` answer from the tree the answer read, comparing the value it printed. |
 | `npm run typecheck` | Type-checks the sources, the tests and both entries with `tsc --noEmit`. |
 | `npm run build` | Emits `dist/` from `tsconfig.build.json`. |
 

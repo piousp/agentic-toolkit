@@ -218,6 +218,53 @@ it("refuses a diff path the resolved set does not hold", async (t) => {
   );
 });
 
+// R5: an entry that climbs out of the root with `..` is an escape once its segments
+// are normalised, so it answers PATH_OUTSIDE_ROOT in the area selector and in the diff
+// paths alike. A name that merely begins with dots stays inside the root and is
+// measured, which is what a check against the leading characters would wrongly refuse.
+it("refuses a selector path and a diff path that climb out of the root and measures a name that only begins with dots", async (t) => {
+  const root = await makeRoot(t, {
+    "src/a.ts": "export const a = 1;\n",
+    "src/..data.ts": "export const data = 1;\n",
+  });
+  const deps = await depsOf(root);
+
+  await assert.rejects(
+    () =>
+      runMeasure(
+        { scope: { mode: "area", area: { kind: "module", path: "../outside" } } },
+        deps,
+      ),
+    (error: WorkspaceError) => {
+      assert.equal(error.code, "PATH_OUTSIDE_ROOT");
+      return true;
+    },
+  );
+
+  await assert.rejects(
+    () =>
+      runMeasure(
+        { scope: { mode: "diff", base: "HEAD", paths: ["../outside.ts"] } },
+        { workspace: deps.workspace, git: diffGit(["src/a.ts"]) },
+      ),
+    (error: WorkspaceError) => {
+      assert.equal(error.code, "PATH_OUTSIDE_ROOT");
+      return true;
+    },
+  );
+
+  const inside = await runMeasure(
+    { scope: { mode: "area", area: { kind: "module", path: "src/..data.ts" } } },
+    deps,
+  );
+  assert.deepEqual(inside.scope.files, ["src/..data.ts"]);
+  assert.deepEqual(
+    inside.files.map((file) => file.path),
+    ["src/..data.ts"],
+  );
+  assert.equal(inside.files[0]?.loc, 1);
+});
+
 it("refuses diff paths in an area request", async (t) => {
   const root = await makeRoot(t, { "src/a.ts": "export const a = 1;\n" });
   // The schema in front of the service refuses this shape, but the resolver owns

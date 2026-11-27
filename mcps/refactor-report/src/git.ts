@@ -77,13 +77,21 @@ export function createGit(workspace: Workspace): Git {
     resolveCommit: (base: string) => resolveCommit(root, base),
     async changedPaths(base: string): Promise<string[]> {
       // ACMR and not D: a deleted path has nothing to measure, and the diff of
-      // the working tree still reports the paths that exist.
-      return lines(await runGit(root, ["diff", "--name-only", "--diff-filter=ACMR", base], "FILE_UNREADABLE"));
+      // the working tree still reports the paths that exist. --relative is what
+      // keeps the listing in the coordinates this server reads: without it git
+      // prints every path relative to the repository root and excludes nothing,
+      // so a workspace below that root would ask for a file at the wrong place.
+      return lines(
+        await runGit(root, ["diff", "--name-only", "--relative", "--diff-filter=ACMR", base], "FILE_UNREADABLE"),
+      );
     },
     async deletedPaths(base: string): Promise<string[]> {
       // D10: a deletion is the one change with nothing left to measure, so it is
-      // listed apart and never reaches the measured set.
-      return lines(await runGit(root, ["diff", "--name-only", "--diff-filter=D", base], "FILE_UNREADABLE"));
+      // listed apart and never reaches the measured set. The listing carries the
+      // same --relative for the same reason the changed set does.
+      return lines(
+        await runGit(root, ["diff", "--name-only", "--relative", "--diff-filter=D", base], "FILE_UNREADABLE"),
+      );
     },
     async untrackedPaths(): Promise<string[]> {
       return lines(await runGit(root, ["ls-files", "--others", "--exclude-standard"], "FILE_UNREADABLE"));

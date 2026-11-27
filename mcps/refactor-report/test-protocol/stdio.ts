@@ -211,3 +211,127 @@ it("lists exactly the measure and preview verbs over stdio", { timeout: 20_000 }
 
   assert.deepEqual(toolNamesOf(result), ["measure", "preview"]);
 });
+
+// The error body travels as one text block, so a caller parses that block: the shape
+// of the document is the contract, not the prose a transport might write around it.
+function textBodyOf(result: Record<string, unknown>, label: string): unknown {
+  const content = result.content;
+  assert.equal(
+    Array.isArray(content),
+    true,
+    `${label} answered no content array: ${JSON.stringify(result)}`,
+  );
+  const [first] = content as readonly { readonly type?: unknown; readonly text?: unknown }[];
+  assert.equal(first?.type, "text", `${label} answered no text block: ${JSON.stringify(result)}`);
+  const text = String(first?.text);
+  try {
+    return JSON.parse(text);
+  } catch {
+    assert.fail(`${label} answered a body that is not JSON: ${JSON.stringify(text)}`);
+  }
+}
+
+// The schema each verb advertises, read by name so the assertion names the verb.
+function inputSchemaOf(result: Record<string, unknown>, name: string): Record<string, unknown> {
+  const tools = result.tools;
+  assert.equal(
+    Array.isArray(tools),
+    true,
+    `tools/list answered no tools array: ${JSON.stringify(result)}`,
+  );
+  const listed = (tools as readonly { readonly name?: unknown }[]).find(
+    (tool) => tool.name === name,
+  );
+  assert.notEqual(listed, undefined, `tools/list advertises no ${name} verb`);
+  const schema = (listed as { readonly inputSchema?: unknown }).inputSchema;
+  assert.equal(
+    typeof schema,
+    "object",
+    `the ${name} verb advertises no inputSchema: ${JSON.stringify(listed)}`,
+  );
+  return schema as Record<string, unknown>;
+}
+
+// R1: a request either verb declares no field for is refused by that verb's own
+// validation, so the answer carries the typed body both surfaces print (D8) instead
+// of a sentence the transport wrote. The listing keeps `additionalProperties: false`
+// in the same case, so a fix that drops the strict schema from the wire cannot pass.
+it(
+  "refuses an argument neither verb declares with the typed PARAM_INVALID body",
+  { timeout: 20_000 },
+  async (t) => {
+    const peer = startEntry(t);
+    resultOf(await initialize(peer), "initialize", peer);
+
+    const listed = resultOf(await peer.request(2, "tools/list"), "tools/list", peer);
+    for (const name of ["measure", "preview"]) {
+      assert.equal(
+        inputSchemaOf(listed, name).additionalProperties,
+        false,
+        `the ${name} schema still refuses a field it does not declare`,
+      );
+    }
+
+    let id = 3;
+    for (const name of ["measure", "preview"]) {
+      const label = `${name} tools/call`;
+      const answered = await peer.request(id, "tools/call", { name, arguments: { bogus: 1 } });
+      id += 1;
+      const result = resultOf(answered, label, peer);
+
+      assert.equal(
+        result.isError,
+        true,
+        `${label} answered a request it cannot serve as a success: ${spelled(answered)}`,
+      );
+      assert.equal(
+        Object.hasOwn(result, "structuredContent"),
+        false,
+        `${label} answered structured content for a refused request: ${spelled(answered)}`,
+      );
+      const body = textBodyOf(result, label) as { readonly error?: { readonly code?: unknown } };
+      assert.equal(
+        body.error?.code,
+        "PARAM_INVALID",
+        `${label} answered a code other than the one a refused request carries: ${spelled(answered)}`,
+      );
+    }
+  },
+);
+
+// R1: the advertised schema leaves which mode a scope carries to the resolver, so a
+// request that names no mode is a document the service reads and not a shape the
+// transport refuses. The answer names the absence with its own code, which is what
+// makes the distinction reachable from the wire at all.
+it(
+  "answers a measure request carrying no scope mode with the typed SCOPE_MISSING body",
+  { timeout: 20_000 },
+  async (t) => {
+    const peer = startEntry(t);
+    resultOf(await initialize(peer), "initialize", peer);
+
+    const label = "measure tools/call with an empty scope";
+    const answered = await peer.request(2, "tools/call", {
+      name: "measure",
+      arguments: { scope: {} },
+    });
+    const result = resultOf(answered, label, peer);
+
+    assert.equal(
+      result.isError,
+      true,
+      `${label} answered a request it cannot serve as a success: ${spelled(answered)}`,
+    );
+    assert.equal(
+      Object.hasOwn(result, "structuredContent"),
+      false,
+      `${label} answered structured content for a refused request: ${spelled(answered)}`,
+    );
+    const body = textBodyOf(result, label) as { readonly error?: { readonly code?: unknown } };
+    assert.equal(
+      body.error?.code,
+      "SCOPE_MISSING",
+      `${label} answered a code other than the one a request with no scope mode carries: ${spelled(answered)}`,
+    );
+  },
+);

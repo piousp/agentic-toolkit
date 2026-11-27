@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import { z } from "zod";
 
 import type { LineRange } from "./linediff.ts";
@@ -66,6 +68,16 @@ export function commandLine(tokens: readonly string[]): string {
   return tokens.map(quoteArgument).join(" ");
 }
 
+// R3/D5: an evidence command is pasted in the tree it measured, so the build cannot be
+// named by the bare `dist/cli.js` that exists at the package root only. The entry token
+// is the path from the measured root to the built file, whose directory is resolved the
+// way `rulesetDir` resolves the rulesets: beside the sources and below dist alike. The
+// quoting stays with `commandLine`, so both verbs spell their evidence the same way.
+export function evidenceCommand(workspaceRoot: string, args: readonly string[]): string {
+  const entry = path.resolve(import.meta.dirname, "..", "dist", "cli.js");
+  return commandLine(["node", path.relative(workspaceRoot, entry), ...args]);
+}
+
 // `select` narrows what the answer reports, so a metric the request did not ask
 // for is absent instead of zero: a zero that was never measured is a number the
 // caller would trust. The metric keys are optional for that reason, and the
@@ -132,7 +144,7 @@ export const areaSelectorSchema = z.discriminatedUnion("kind", [
 // is one whose rejection code the resolver already produces, and a key it does not
 // know is still refused.
 export const measureScopeSchema = z.strictObject({
-  mode: z.unknown(),
+  mode: z.unknown().optional(),
   base: z.unknown().optional(),
   paths: z.array(z.string()).optional(),
   area: areaSelectorSchema.optional(),

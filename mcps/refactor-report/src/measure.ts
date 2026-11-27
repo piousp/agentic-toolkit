@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 
 import {
-  commandLine,
+  evidenceCommand,
   MEASURE_LANGUAGE,
   MEASURE_METRICS,
   MEASURE_METRICSET,
@@ -46,6 +46,7 @@ type ResolvedScope = ResolvedDiffScope | ResolvedAreaScope;
 // scope through this view keeps the selector check below from trusting either.
 type ScopeView = {
   readonly mode?: unknown;
+  readonly paths?: unknown;
   readonly area?: unknown;
 };
 
@@ -58,28 +59,54 @@ function selectorPathOf(area: unknown): unknown {
   return (area as { readonly path?: unknown }).path;
 }
 
-// R3: the answer is a document the caller can paste into a report, so no absolute
-// path may reach it. A selector that arrives absolute is refused here, before the
-// resolver reads anything or quotes the path back in a detail.
-function assertRelativeSelectorPath(request: MeasureRequest): void {
-  const scope: ScopeView = request.scope;
-  if (scope.mode !== "area") {
-    return;
+// R3/R5: the answer is a document the caller can paste into a report, so no path
+// outside the root may reach it. Every path surface of the request is refused here,
+// before either resolver reads anything: the area selector's path and the diff
+// `paths`. A relative path stays inside the root while its normalised first segment is
+// a name; an absolute one and one whose normalised form opens with `..` leave the tree,
+// and a name that only begins with dots, like `src/..data.ts`, stays measurable. The
+// refused value is never quoted: an absolute one would carry the root into the answer.
+function escapesRoot(candidate: string): boolean {
+  if (path.isAbsolute(candidate)) {
+    return true;
   }
-  const candidate = selectorPathOf(scope.area);
-  if (typeof candidate === "string" && path.isAbsolute(candidate)) {
+  return path.normalize(candidate).split(path.sep)[0] === "..";
+}
+
+function assertPathsInsideRoot(request: MeasureRequest): void {
+  const scope: ScopeView = request.scope;
+  const entries: string[] = [];
+  if (scope.mode === "area") {
+    const candidate = selectorPathOf(scope.area);
+    if (typeof candidate === "string") {
+      entries.push(candidate);
+    }
+  }
+  if (scope.mode === "diff" && Array.isArray(scope.paths)) {
+    for (const entry of scope.paths as readonly unknown[]) {
+      if (typeof entry === "string") {
+        entries.push(entry);
+      }
+    }
+  }
+  if (entries.some(escapesRoot)) {
     throw new WorkspaceError(
       "PATH_OUTSIDE_ROOT",
-      "a selector path is relative to the workspace root; an absolute path cannot be resolved",
+      "a path in the request is relative to the workspace root and stays inside it; an absolute path or one that climbs out of the root cannot be resolved",
     );
   }
 }
 
+// D3: the area mode is the one branch that reads no history, so the selection names
+// that branch and every other document reaches the diff resolver. That resolver is the
+// one that decides whether the request carries a diff, no mode at all or a mode
+// outside the two, so a missing mode comes back as SCOPE_MISSING instead of a code
+// borrowed from the branch the request never asked for.
 async function resolveScope(request: MeasureRequest, deps: MeasureDeps): Promise<ResolvedScope> {
-  assertRelativeSelectorPath(request);
-  return request.scope.mode === "diff"
-    ? resolveDiffScope(request, deps.git)
-    : resolveAreaScope(request, deps.workspace);
+  assertPathsInsideRoot(request);
+  return request.scope.mode === "area"
+    ? resolveAreaScope(request, deps.workspace)
+    : resolveDiffScope(request, deps.git);
 }
 
 // The response echoes the selector the request named, normalised by the resolver:
@@ -140,16 +167,18 @@ function selectedMetrics(request: MeasureRequest): readonly MeasureMetric[] {
 
 // R4/D8: a reported number travels with the exact command that reproduces it, so
 // the answer is auditable without trusting the server, and only for the metrics
-// that travelled.
+// that travelled. R3: the command is written against the measured root, so it runs in
+// the tree whose number it reproduces.
 function evidenceFor(
   scope: ResolvedScope,
   filePath: string,
   selected: readonly MeasureMetric[],
+  workspaceRoot: string,
 ): MeasureEvidence {
-  const argv = ["node", "dist/cli.js", "measure", ...scopeArguments(scope, filePath)];
+  const args = ["measure", ...scopeArguments(scope, filePath)];
   const evidence: Partial<Record<MeasureMetric, MeasureEvidenceEntry>> = {};
   for (const metric of selected) {
-    evidence[metric] = { command: commandLine([...argv, "--select", metric]) };
+    evidence[metric] = { command: evidenceCommand(workspaceRoot, [...args, "--select", metric]) };
   }
   return evidence;
 }
@@ -173,6 +202,7 @@ function fileEntryOf(
   importers: number,
   selected: readonly MeasureMetric[],
   scope: ResolvedScope,
+  workspaceRoot: string,
 ): MeasureFileEntry {
   const wanted = (metric: MeasureMetric): boolean => selected.includes(metric);
   return {
@@ -183,7 +213,7 @@ function fileEntryOf(
     ...(wanted("max_complexity") ? { max_complexity: measured.max_complexity } : {}),
     ...(wanted("importers") ? { importers } : {}),
     ...(reportsUnits(scope) ? { units: measured.units } : {}),
-    evidence: evidenceFor(scope, filePath, selected),
+    evidence: evidenceFor(scope, filePath, selected, workspaceRoot),
   };
 }
 
@@ -207,13 +237,22 @@ export async function runMeasure(
   assertWithinFileLimit(scope.files.length, deps.maxFiles ?? MEASURE_MAX_FILES);
   const graph = await buildImportGraph(deps.workspace);
   const selected = selectedMetrics(request);
+  const workspaceRoot = deps.workspace.root;
 
   const files: MeasureFileEntry[] = [];
   for (const filePath of scope.files) {
     const text = await deps.workspace.readText(filePath);
     const measured = measureFile(filePath, text);
     files.push(
-      fileEntryOf(filePath, text, measured, graph.importersOf(filePath).count, selected, scope),
+      fileEntryOf(
+        filePath,
+        text,
+        measured,
+        graph.importersOf(filePath).count,
+        selected,
+        scope,
+        workspaceRoot,
+      ),
     );
   }
 

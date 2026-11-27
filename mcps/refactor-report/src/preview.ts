@@ -1,5 +1,5 @@
 import {
-  commandLine,
+  evidenceCommand,
   MEASURE_LANGUAGE,
   MEASURE_METRICSET,
   PREVIEW_VERB,
@@ -144,9 +144,10 @@ function uniquePaths(paths: readonly string[]): readonly string[] {
 
 // R4/D8: the evidence surface is the argv form of the same verb, so an evidence
 // command names the recipe, the rules and the files the request named, and it is the
-// command line the entry reads back.
+// command line the entry reads back. R3: the entry token is left to `evidenceCommand`,
+// which writes it against the tree the preview reads.
 function previewArguments(request: PreviewRequest): string[] {
-  const argv = ["node", "dist/cli.js", PREVIEW_VERB, "--recipe", request.recipe.ruleset];
+  const argv = [PREVIEW_VERB, "--recipe", request.recipe.ruleset];
   for (const rule of request.recipe.rules ?? []) {
     argv.push("--rule", rule);
   }
@@ -155,7 +156,6 @@ function previewArguments(request: PreviewRequest): string[] {
   }
   return argv;
 }
-
 
 export async function runPreview(
   request: PreviewRequest,
@@ -211,8 +211,8 @@ export async function runPreview(
     diff: file.change.diff,
     delta: deltaOf(file, tree.importersOf(file.path).count, overlaid.importersOf(file.path).count),
     evidence: {
-      diff: { command: commandLine([...argv, "--select", "diff"]) },
-      delta: { command: commandLine([...argv, "--select", "delta"]) },
+      diff: { command: evidenceCommand(deps.workspace.root, [...argv, "--select", "diff"]) },
+      delta: { command: evidenceCommand(deps.workspace.root, [...argv, "--select", "delta"]) },
     },
   }));
 
@@ -232,8 +232,8 @@ export async function runPreview(
     // R4: the two document values are reproduced by the command that prints the
     // document, which is the shortest line a caller can paste for either of them.
     evidence: {
-      ruleset_digest: { command: commandLine(argv) },
-      change_digest: { command: commandLine(argv) },
+      ruleset_digest: { command: evidenceCommand(deps.workspace.root, argv) },
+      change_digest: { command: evidenceCommand(deps.workspace.root, argv) },
     },
   };
 }

@@ -388,3 +388,35 @@ it("names a deleted file in skipped instead of measuring it", async (t) => {
   assert.deepEqual(scope.files, []);
   assert.deepEqual(scope.skipped, [{ path: "src/gone.ts", reason: "deleted" }]);
 });
+
+// R2: git lists a diff in repository coordinates and this server reads every path in
+// workspace coordinates. A workspace that is a subdirectory of the repository is where
+// the two differ, so the diff has to arrive already relative to the workspace: the
+// measured files and the deletion are named from the workspace root, and a change
+// outside that root is not this answer's business.
+it("measures a diff in workspace coordinates when the workspace is a subdirectory of the repository", async (t) => {
+  const root = await makeRoot(t, {
+    "src/ticket.ts": "export const ticket = 1;\n",
+    "src/gone.ts": "export const gone = 1;\n",
+    "notes.md": "# notes\n",
+  });
+  const head = await commitAll(root);
+  await writeFile(path.join(root, "src/ticket.ts"), "export const ticket = 2;\n", "utf8");
+  await writeFile(path.join(root, "src/fresh.ts"), "export const fresh = 1;\n", "utf8");
+  await rm(path.join(root, "src/gone.ts"));
+  await writeFile(path.join(root, "notes.md"), "# notes, edited\n", "utf8");
+  const workspace = await openWorkspace(path.join(root, "src"));
+
+  const answer = await runMeasure(
+    { scope: { mode: "diff", base: "HEAD" } },
+    { workspace, git: createGit(workspace) },
+  );
+
+  assert.equal(answer.scope.base_commit, head);
+  assert.deepEqual(answer.scope.files, ["fresh.ts", "ticket.ts"]);
+  assert.deepEqual(answer.scope.skipped, [{ path: "gone.ts", reason: "deleted" }]);
+  assert.deepEqual(
+    answer.files.map((file) => file.path),
+    ["fresh.ts", "ticket.ts"],
+  );
+});

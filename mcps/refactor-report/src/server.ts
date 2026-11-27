@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/server";
-import type { CallToolResult } from "@modelcontextprotocol/server";
+import type { CallToolResult, StandardSchemaWithJSON } from "@modelcontextprotocol/server";
 
 import { measureRequestSchema, previewRequestSchema } from "./contracts.ts";
 import type { MeasureRequest, PreviewRequest } from "./contracts.ts";
@@ -94,6 +94,23 @@ async function answerPreview(args: unknown, deps: ServerDeps): Promise<CallToolR
   }
 }
 
+// The transport checks the arguments against the advertised schema before the callback
+// runs, and it words a refusal in its own prose, which would leave the code both verbs
+// answer with unreachable. The wrapper keeps the advertised JSON Schema, so `tools/list`
+// still publishes the strict shape D1 fixes, and hands the arguments through unchanged,
+// so `answerMeasure` and `answerPreview` own the refusal and name it PARAM_INVALID.
+function callbackValidated(schema: StandardSchemaWithJSON): StandardSchemaWithJSON<unknown, unknown> {
+  const standard = schema["~standard"];
+  return {
+    "~standard": {
+      version: standard.version,
+      vendor: standard.vendor,
+      jsonSchema: standard.jsonSchema,
+      validate: (value: unknown) => ({ value }),
+    },
+  };
+}
+
 // R1/R10: one registry per connection. The stdio entry owns the lifetime of the
 // process, so a server is built per connection and carries no state across them.
 export function createServer(deps: ServerDeps): McpServer {
@@ -104,7 +121,7 @@ export function createServer(deps: ServerDeps): McpServer {
     {
       description:
         "Report per-file TypeScript metrics over a scope of the work tree, each number with the command that reproduces it.",
-      inputSchema: measureRequestSchema,
+      inputSchema: callbackValidated(measureRequestSchema),
     },
     (args: unknown) => answerMeasure(args, deps),
   );
@@ -114,7 +131,7 @@ export function createServer(deps: ServerDeps): McpServer {
     {
       description:
         "Report the edits a published ruleset recipe would make, with applied false and nothing written to disk.",
-      inputSchema: previewRequestSchema,
+      inputSchema: callbackValidated(previewRequestSchema),
     },
     (args: unknown) => answerPreview(args, deps),
   );

@@ -36,6 +36,14 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `mcps/refactor-report/src/scope.ts`: a changed file outside the measured languages is named in `skipped` instead of aborting the whole run in diff mode.
 - `scripts/check_links.py`: skip installed dependencies, whose own READMEs link files they do not ship, so the check survives an installed tree.
 - `agents/coding/code-planner/AGENT.md`, `agents/general/planner/AGENT.md`: quote the `summary:` value so the frontmatter parses without lenient recovery.
+- `mcps/refactor-report/src/server.ts`: refuse an argument the schema rejects with the typed `PARAM_INVALID` body, which the transport's own prose was hiding.
+- `mcps/refactor-report/src/contracts.ts`: leave the scope mode optional, so a request carrying none reaches the resolver and answers `SCOPE_MISSING`.
+- `mcps/refactor-report/src/contracts.ts`: write an evidence command against the root it is measured from instead of the package's own `dist/`.
+- `mcps/refactor-report/src/git.ts`: list the diff relative to the workspace, so a workspace below the repository root can be measured.
+- `mcps/refactor-report/src/measure.ts`, `mcps/refactor-report/src/preview.ts`: emit every evidence command of both verbs against the measured root.
+- `mcps/refactor-report/src/measure.ts`: refuse a selector path or a diff path that climbs out of the root with `PATH_OUTSIDE_ROOT`.
+- `mcps/refactor-report/test-protocol/stdio.ts`, `mcps/refactor-report/test-cli/roundtrip.ts`: cover the typed refusals, the diff below the repository root and the evidence round trip of both verbs.
+- `mcps/README.md`: drop the line that said nothing is published, now that a server is.
 
 ## 2026-11-26
 
