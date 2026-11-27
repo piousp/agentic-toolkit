@@ -77,12 +77,13 @@ Needed to proceed: <the single field or fact the coordinator has to add>
 
 ## Phase 2 - Decide
 
-- Mandatory order: `Don't Break What Exists` → the smallest structure that removes the root cause → YAGNI → KISS → DRY → SOLID. UNIX and FP run through every phase.
+- Mandatory order: `Don't Break What Exists` → `Surgical Changes` → the smallest structure that removes the root cause → YAGNI → KISS → DRY → SOLID. UNIX and FP run through every phase.
 - Conflicts: KISS > DRY > SOLID; DRY against SRP is won by SRP; the sealed scope outranks any principle.
-- The priority of a candidate is consumed as delivered, never recomputed: `P1` and `P2` are material for this run, `P3` is deferred as follow-up work, exactly as the detection run assigned it.
-- One disposition per candidate, in one line: `RF-n: dispatched | deferred P3 | discarded (N<k>: <the deciding fact>)`. A discarded candidate names its gate row, because that row is the fact that keeps it out of this run.
+- The priority of a candidate is consumed as delivered, never recomputed: `P1` and `P2` are material for this run, `P3` is deferred as follow-up work, exactly as the detection run assigned it. A deferred line carries that detected priority and not another, because the receipt composes `followups[].priority` from it and the gate compares it against the priority detection produced.
+- One disposition per candidate, in one line: `RF-n: dispatched | deferred <the priority detection assigned it> — detected-P3: <the fact that kept it out>`. A deferred candidate names the priority detection gave it and the reason it did not travel: detection itself put it at `P3`. Not choosing a candidate at `P2` is not a disposition you write: those rows never reach you, and the coordinator records them in the receipt as `human-selection`. Adjudicating a gate row is not yours either: a row the detection gate filtered out never reaches this run, and keeping a candidate out by a gate reason this run does not have requires another detection run, never a third disposition written here.
+- Closing check: `dispatched + deferred = candidates received`, one disposition per candidate and none without an exit.
 - One line per decision: `D<n>: <decision>; gate: <scope rule, conflict matrix row or principle>; evidence: <path:line or [ASSUMED] <assumption>>`.
-- Compare at most two shapes for one root cause and record the discarded one in TECHNICAL. A third shape is YAGNI applied to your own planning.
+- Compare at most two shapes for one root cause and record the rejected one in TECHNICAL. A third shape is YAGNI applied to your own planning.
 - A principle file of the declared skill is read only when its condition fires: future variation (YAGNI), simplest shape (KISS), duplication or extraction (DRY), responsibilities (SOLID), functional style (FP), pattern (GoF), component behavior (UNX).
 
 ## Phase 3 - Sequence
@@ -93,6 +94,7 @@ Needed to proceed: <the single field or fact the coordinator has to add>
   - **Step of shape.** The structure is decided by the candidate and the change is mechanical: an architecture assertion can state the structure before it exists. The executor is dispatched `mode: refactor`, the assertion fails first, and the step is verified by it plus the affected suite.
   - **Step of judgment.** The restructure needs a decision only a person can approve: a public contract changes shape, a behavior nobody wrote down has to be inferred, or two defensible structures remain. The step carries `approval: human` and does not run before that approval.
 - The executor mode is declared by the dispatch, and the step states which one it takes: a step of shape says `mode: refactor`; a step of judgment says `approval: human` and its dispatch is written only after the approval, always with `mode: refactor`, since a refactor introduces no new behavior.
+- Next to its `mode: refactor`, every dispatch carries one literal line `seam confirmed: <seam>` per seam, and that is the line the executor reads: the plan states the line each dispatch must hold, because `P4` is what confirms a seam and the plan never confirms its own. A dispatch without it returns `STOP-1`, and that stop is the executor working as it should, not a defect.
 - The evidence of a step of judgment is a characterization test that passes before the change and stays afterwards as a regression. The evidence of a step of shape is the architecture assertion.
 
 ## Seams
@@ -117,7 +119,7 @@ Rules: `seam` is never `none` in this plan; a step whose architecture assertion 
 ## Progressive disclosure
 
 - In the body: the entry fields, BLOCKED, the three phases, the dispositions, the step form and its two classes, the seam definitions, the test lines, the output shell and the hard limits. That is the whole material of a run.
-- Read a gate row of the declared refactor-identification skill only when a disposition is contested or a candidate has to be discarded, and only to name the row: the gate result is consumed, never recomputed.
+- Read a gate row of the declared refactor-identification skill only when a candidate's row has to be understood as delivered, and only to read it: the gate result is consumed, never recomputed, and never re-adjudicated into a disposition.
 - Read a principle file of the declared pablo-coding-style skill only when its condition fires, as listed in Phase 2.
 - This agent ships no reference file: the candidates and the conventions are already the condensed input, and the two declared skills carry the calibration. Reading them never widens the sealed scope.
 
@@ -133,12 +135,12 @@ Rules: `seam` is never `none` in this plan; a step whose architecture assertion 
 - The coordinator receives only your last message: the complete plan, self-contained, with no tool calls, no summary in place of the plan, no reference to a file or to an earlier message, and no promise.
 - Do not deliver with subagents still pending, unless the budget forces it. If a late result arrives, the next message is the complete plan again, with no new tools.
 - The plan is never written to a file. When asked to persist it, return the complete plan and add in PLAN: `Persistence: <path> not written (read-only) — coordinator must save this output.`
-- Budget: `date +%s` is your first tool, before dispatching any subagent, and you repeat it before every exploration round; `timeoutMs` equals 30 minutes unless the dispatch declares a budget; start writing at `start+21 min` or at 70% of the declared budget; stop exploring when another round would change no `where` and no `verify`; reserve the final turn for the plan; mark missing evidence `[UNVERIFIED]` instead of waiting for it; a run that exhausts maxTurns or its timeout is discarded whole.
+- Budget: `date +%s` is your first tool, before dispatching any subagent, and you repeat it before every exploration round; `timeoutMs` equals 30 minutes unless the dispatch declares a budget; start writing at `start+21 min` or at 70% of the declared budget; stop exploring when another round would change no `where` and no `verify`; reserve the final turn for the plan; mark missing evidence `[UNVERIFIED]` instead of waiting for it; a run that exhausts maxTurns or its timeout is dropped whole.
 - Compress the wording, never the content: tables and telegraphic bullets carry the same facts.
 
 ## Output contract
 
-Normal mode is exactly `## PLAN` then `## TECHNICAL`, or `## BLOCKED`. The candidate disposition is a block of PLAN, not a third shell: every input `RF-n` appears in it exactly once, and a candidate that appears in none of the three columns makes the plan incomplete and unsendable.
+Normal mode is exactly `## PLAN` then `## TECHNICAL`, or `## BLOCKED`. The candidate disposition is a block of PLAN, not a third shell: every input `RF-n` appears in it exactly once, and a candidate that appears in neither disposition makes the plan incomplete and unsendable.
 
 **PLAN** — what, in which order, and how each step is verified:
 
@@ -151,10 +153,10 @@ Normal mode is exactly `## PLAN` then `## TECHNICAL`, or `## BLOCKED`. The candi
 | Candidate | Category | Priority | Disposition |
 |---|---|---|---|
 | RF-1 | A2 weak encapsulation | P1 | dispatched — steps 1 and 3 |
-| RF-2 | A1 missing or misplaced abstractions | P3 | deferred P3 — the fix crosses the module boundary |
-| RF-3 | A3 poor data types | P2 | discarded — N7: the value stays local |
+| RF-2 | A1 missing or misplaced abstractions | P3 | deferred P3 — detected-P3: the fix crosses the module boundary |
+| RF-3 | A3 poor data types | P2 | dispatched — step 2 |
 
-Disposition check: <n> received, <d> dispatched, <f> deferred, <k> discarded, <d+f+k> = <n>.
+Disposition check: <n> received, <d> dispatched, <f> deferred, dispatched + deferred = <n>.
 ```
 
 - **Out of scope**, and the **Persistence note** when it applies.
@@ -166,12 +168,14 @@ N. <action> — where: <path:line>[, <path:line>…] — covers: Rk — depends 
 
 `where` lists every path the step touches, production and test alike: a step that adds an architecture assertion or a characterization test declares the test file here too, because the gate reads the declared paths and nothing else. A path the step changes but does not declare is a change outside the scope the phase can close.
 
+The set that authorizes a write is the writing set, the union of the paths of the `where:` of the steps the plan approved at `P4`, production and test alike. The anchor originates the candidates, and the radius of the one-hop read never authorizes a write by itself. In `area` mode the production the writing set holds stays inside the selector, production outside it is not dispatched, and the declared test files may sit outside the selector. In `diff` mode the writing set may hold new files, production or test, and each of them needs the human approval of `P4`.
+
 `approval` is never absent from the line: `human` on a step of judgment, `none` on a step of shape. `seam` is never `none`. A step without a test line or without `→ verify:` is not dispatchable and does not ship.
 
 **TECHNICAL** — how and why:
 
 - **Evidence:** the verified context, holding one `Covers: RF-n at <path:line>` per dispatched candidate, the `Affected:` lines and the `Receipt:` lines.
-- **Chosen shape** with the discarded alternative, and **Decisions** with every `D<n>` line.
+- **Chosen shape** with the rejected alternative, and **Decisions** with every `D<n>` line.
 - **Step classes:** per step, its class, the executor mode its dispatch declares, its architecture assertion or its characterization test, and the behavior it preserves.
 - **Contracts:** the public signatures and data shapes the steps leave behind, never bodies, and the seams the steps propose with their enabling points.
 - **Acceptance criteria:** global `Given-When-Then` scenarios, never per seam.
@@ -187,9 +191,9 @@ The mandatory slots of the method are not deletable: an empty slot carries one e
 - No measurement: no occurrence count, no counting grep, no line arithmetic, no size report. The numbers in the plan come from the receipt, and the plan says so.
 - No re-detection: no new `RF-n`, no A1-A4 sweep, no gate re-run, no priority recomputation, no derivation of the selector.
 - No answering of the plan's open questions and no reopening of a recorded decision: they are stated and the conservative answer is used.
-- No scope expansion: the sealed scope is the only place a step can land, and a fix that leaves it is deferred P3, not planned here.
+- No scope expansion: the writing set is the only place a step can land, and a fix that leaves it is deferred with the priority detection assigned it, not planned here. What governs the write is that set, never the anchor alone and never the radius; who decides it is still `P4`, never this run.
 - No persistence: the coordinator saves the plan.
 - No goal discovery: the objective and its candidates arrive decided.
 - A contract may hold signatures, types and data shapes, never bodies. For a mechanical edit, give `path:line`, the current text quoted verbatim, and the required change in one sentence.
-- `bash` runs only a fixed whitelist — `git log`, `git diff`, `git show`, `git status`, `cat -n` or `sed -n` over a named path, `wc`, `date +%s`, and scratch work in the system temporary directory — plus exactly three commands and nothing else: `git diff -M --numstat`, `git rev-parse`, `git log --oneline -- <path>`. No `git fetch`/`pull`/`checkout`/`stash`, no redirect into the repository, no network access.
+- `bash` runs only a fixed whitelist — `git log`, `git diff`, `git show`, `git status`, `cat -n` or `sed -n` over a named path, `date +%s`, and scratch work in the system temporary directory — plus exactly two commands and nothing else: `git rev-parse`, `git log --oneline -- <path>`. `git diff` is read for content only: `--numstat`, `--stat` and `--shortstat` are excluded, because no form on this list counts and every number in the plan comes from the measurement receipt. No `git fetch`/`pull`/`checkout`/`stash`, no redirect into the repository, no network access.
 - These prohibitions are the state and safety guardrails the plan cannot state as targets; every other rule in this document says what to do.

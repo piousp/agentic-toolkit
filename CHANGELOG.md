@@ -34,6 +34,12 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `docs/refactor-phase.md`: `conventions` is produced at `P0`, consumed sealed at `P3`, recorded in the receipt and read at the gate for the full suite it names.
 - `agents/coding/refactor-planner/AGENT.md`: the four facts `conventions` carries, and one rule for a `conventions` that is missing a fact.
 - `agents/coding/code-implementer/AGENT.md`: the test framework and the test class come from the plan, and the full suite is never inferred.
+- `docs/refactor-phase.md`: `preview_match` replaces the identity condition of closing, and the preview digest becomes optional evidence.
+- `docs/refactor-phase.md`: `P2` records a partition, and a follow-up keeps the priority detection gave it with its reason.
+- `docs/refactor-phase.md`: the anchor, the one-hop radius and the writing set are separate, and closing compares against the writing set.
+- `docs/refactor-phase.md`: a step's dispatch carries the literal `seam confirmed` line, and `checks` keeps the step suites and the full suite apart.
+- `agents/coding/refactor-planner/AGENT.md`: a disposition names the detected priority, a gate row is never re-adjudicated and a candidate is never discarded here.
+- `agents/coding/refactor-planner/AGENT.md`: the writing set governs a write, the whitelist drops its counting forms and `Surgical Changes` returns to the order.
 
 ### Fixed
 

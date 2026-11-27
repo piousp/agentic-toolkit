@@ -33,21 +33,65 @@ The server measures and previews; it never writes.
 |---|---|---|---|
 | `P0` freeze | the scope is fixed once and sealed: the diff text, or the sha256 manifest; `tree_clean` and `base_ref` are recorded here and never later; `conventions` is produced here too, its four facts each with evidence, from the reading this state authorizes | sealed selector, its digest, `tree_clean`, `base_ref`, `conventions` | coordinator |
 | `P1` detection | the four categories and their thresholds run over the frozen scope only | `RF-n` rows: category, evidence, measure, gate note, priority | detection |
-| `P2` selection | a person chooses which `RF-n` rows this run dispatches | `candidates:` for the dispatch | human |
+| `P2` selection | a person chooses which `RF-n` rows this run dispatches, and the choice is recorded as the complete partition of the detected set: every `RF-n` is either a selected candidate or a not-selected one, and not selecting never equals discarding it nor lowering its priority | `candidates:` for the dispatch, the not-selected rows with the priority detection gave them | human |
 | `P3` plan | one disposition per candidate, steps in dependency order, one test line and one `verify:` per step, seams proposed; `conventions` arrives already produced and sealed, and is consumed as given, never inferred and never completed | PLAN / TECHNICAL | planner |
 | `P4` approval | a person approves the plan; the approval counts as the confirmation of every seam and of every step carrying `approval: human` | approved plan, one dispatch per step | human |
 | `P5` execution | one step per run with `mode: refactor`, evidence persisted; a step of judgment does not run before `P4` | changed files, the step's `verify:` result | executor |
-| `P6` gate | the manifest is remeasured and compared with the frozen one; the full suite is the command `conventions.full_suite_command` names, and the `verify:`s and digests are read | green, or red attributed to the phase or to the environment | coordinator |
+| `P6` gate | the manifest is remeasured and compared with the frozen one; the full suite is the command `conventions.full_suite_command` names, and the `verify:`s and the optional preview evidence are read | green, or red attributed to the phase or to the environment | coordinator |
 | `P7` closing | the receipt is written: the run closes, or round 2 opens | receipt with `verdict` and `round` | coordinator |
 
 No run reaches `P5` with a seam that only the plan proposed. `P4` is where seams
 stop being proposals, and it is a human decision, not a step.
 
-## The anchor
+The approval of `P4` reaches the executor in the form the executor reads: the
+dispatch of each step carries one literal line `seam confirmed: <seam>` per seam,
+next to its `mode: refactor`. The approved plan already confirms those seams, but
+the dispatch still has to say so with that line; a dispatch without it returns
+`STOP-1`, and that stop is the executor working as it should, not a defect.
 
-- The anchor is the frozen scope plus a sha256 manifest, one line per file in
-  scope, `<sha256>  <path>`, taken from the state read at freeze. Its digest is
-  the identity of the run.
+## The selection
+
+`P2` is human and its output is a partition, not a filter: every `RF-n` detection
+produced is either a candidate for this run or a not-selected one, and both
+halves are recorded. Not selecting a candidate is neither a discard nor a
+demotion: the row keeps the priority detection assigned it, and the reason
+written for it is `human-selection`. Discarding belongs to detection alone, so a
+candidate the detection gate already filtered out, `Filtered out (N<k>)`, stays
+there and is never re-adjudicated in this phase; keeping a candidate out by a
+gate reason this phase does not have requires another detection run, never a new
+row written here.
+
+## The anchor, the radius and the writing set
+
+Three sets, named separately and never merged:
+
+- **Anchor**: the frozen scope, a hunk of the sealed diff or the selector with
+  its sha256 manifest, one line per file in scope, `<sha256>  <path>`, taken
+  from the state read at freeze. It originates the candidates and it is never
+  widened: no read and no step adds a path to it. Its digest is what names the
+  run.
+- **Radius**: the reading one hop away from the anchor, the direct callers and
+  callees, the tests that exercise the place, and whatever else a step needs a
+  cited fact from. The radius originates no `RF-n` and, on its own, never
+  authorizes a write.
+- **Writing set**: the union of the paths of the `where:` of the steps the plan
+  approved at `P4`, production and test alike. It is computed at `P4`, and it is
+  the only set a write lands in.
+
+How the three read in practice:
+
+- No hunk, no selector and no radius authorizes a write that no approved
+  `where:` declares. A step that writes a path its `where:` does not hold is a
+  change outside the set, and the gate reads it as one.
+- In `area` mode the production the writing set holds stays inside the selector:
+  production outside it is not dispatched. The declared test files of a step may
+  sit outside the selector, because the test that observes a frozen area often
+  lives elsewhere.
+- In `diff` mode the writing set may hold new files, production or test, and each
+  of them needs the human approval of `P4` like any other declared path.
+
+What the anchor records, and what it refuses:
+
 - `base_ref` is git metadata: optional, recorded only when `tree_clean` is true
   (an empty `git status --porcelain` at freeze). On a dirty tree it is `absent`,
   because the base would then be a claim and not a fact.
@@ -56,6 +100,9 @@ stop being proposals, and it is a human decision, not a step.
   and nothing is compared against a previous run.
 - A file that changes after the freeze makes a different scope. The gate says so
   and never re-reads the file as though it were still the same run.
+- The conditions of closing compare against the writing set, never against the
+  anchor alone: the remeasured manifest, the declared paths and the diff of the
+  run are read together.
 
 ## The conventions object
 
@@ -76,7 +123,7 @@ four facts, and no value travels without its evidence:
   gate reads a declaration instead of a run that never happened.
 - Reading authorized for this purpose and for nothing else: to assemble
   `conventions`, `P0` may read the manifests and the tests outside the anchor.
-  Those reads originate no `RF-n` and do not widen the detection radius; the
+  Those reads originate no `RF-n` and do not widen the radius; the
   frozen scope still decides where a finding lands, and no other read is excused
   from it.
 - A missing field, or a missing one of the four facts, is `BLOCKED` naming that
@@ -89,8 +136,8 @@ four facts, and no value travels without its evidence:
 
 | Mode | Selector | Anchor | What closing adds |
 |---|---|---|---|
-| `diff` | the diff the caller hands over, or the branch's own diff, sealed by the sha256 of the diff text | the changed hunks | the change fits inside the frozen diff or inside the paths the steps declared; `base_ref` only with `tree_clean` |
-| `area` | one granularity, function, class, module or repository, with every symbol resolved to exactly one declaration | the sha256 manifest of every file under the selector | `followups[]` lists every candidate not dispatched as `P3` with its reason; closing with follow-ups is a valid close |
+| `diff` | the diff the caller hands over, or the branch's own diff, sealed by the sha256 of the diff text | the changed hunks | the change fits inside the writing set, which may add new files, production or test, each approved at `P4`; `base_ref` only with `tree_clean` |
+| `area` | one granularity, function, class, module or repository, with every symbol resolved to exactly one declaration | the sha256 manifest of every file under the selector | `followups[]` lists every candidate not dispatched, with the priority detection gave it and its reason, `human-selection` or `detected-P3`; closing with follow-ups is a valid close |
 
 The modes are exclusive because a run has one anchor: a hunk and a declared area
 cannot both be the place a finding lands. A dispatch carries exactly one branch,
@@ -99,7 +146,8 @@ preference to resolve, so the run is `BLOCKED`. The mode changes the anchor
 (hunks against a manifest), the priority cascade (a branch-added root cause
 against where the fix is produced inside the selector: the root cause's own
 file, another file of the selector, or a fix that crosses it) and what closing
-requires (fitting the diff against a complete follow-up list).
+requires (fitting the diff against the writing set and, in `area`, against a
+complete follow-up list).
 
 ## The receipt
 
@@ -117,14 +165,14 @@ and never in the target repository:
   "base_ref": "<ref|absent>",
   "conventions": {"test_framework": "<value> at <path:line>", "test_layout_naming": "<value> at <path:line>", "source_layout_naming": "<value> at <path:line>", "full_suite_command": "<command> at <path:line>|none, justification"},
   "measures": [{"path": "<path>", "sha256": "<digest>", "loc": "<n>", "command": "<verbatim>"}],
-  "preview_digest": "<digest of the previewed change>",
-  "applied_digest": "<digest of the applied change>",
-  "identity": "<true|false>",
+  "preview_match": "<true|false|null>",
+  "preview_digest": "<digest of the previewed change, or null when nothing was previewed>",
+  "applied_digest": "<digest of the applied change, or null when nothing was applied>",
   "ruleset": "<file>#sha256:<12> of the transformation ruleset the preview used>",
   "steps": [{"n": "<step>", "verify": "<verbatim verify: text>", "command": "<verbatim>", "status": "<pass|fail|blocked>"}],
-  "checks": "<suite result per touched file, and the pre-existing failures>",
+  "checks": {"steps": [{"n": "<step>", "affected_suite": "<command and result per touched file>", "preexisting_failures": "<names and counts>"}], "full_suite": {"command": "<conventions.full_suite_command>", "status": "<pass|fail|not_applicable|environmental>", "result": "<counts and failing tests>", "justification": "<why it did not run, when it did not>"}},
   "tests_added": [{"path": "<path>", "kind": "<architecture|characterization>", "lifecycle": "<keep|retire|pending-decision>"}],
-  "followups": [{"rf": "<RF-n>", "priority": "<P3>", "why": "<reason it was not dispatched>"}],
+  "followups": [{"rf": "<RF-n>", "priority": "<as detected: P1|P2|P3>", "reason": "<human-selection|detected-P3>", "why": "<reason it was not dispatched>"}],
   "verdict": "<green|red-attributable|red-environmental>",
   "emitter": "<coordinator>",
   "emitted_at": "<ISO-8601 timestamp>"
@@ -140,38 +188,69 @@ first twelve characters of its digest, so a run that changed the rules is a
 different run. `steps[]` holds each step's `verify:` text
 and the command that showed it, so the gate can be repeated from the receipt.
 
+`preview_match` carries the relation between the two digests and nothing else:
+`null` when one or both are missing, `true` when both exist and agree, `false`
+when both exist and differ. `preview_digest` and `applied_digest` are optional
+evidence, recorded only when the run previewed a change through the server and
+applied it; their absence is a missing witness, not a failed run.
+
+`checks` keeps two kinds of evidence apart. `checks.steps[]` holds each step's
+affected suite with the pre-existing failures it inherited, because that suite
+proves the step and never the run. `checks.full_suite` holds the single run of
+`conventions.full_suite_command` that the gate performs, with its counts and
+the failures it found. A full suite that could not run is a status with its
+justification, never a green written in place of a run.
+
+`followups[]` holds every candidate the run did not dispatch, with the priority
+detection assigned it and the reason it did not travel: `human-selection` when a
+person left it out at `P2`, `detected-P3` when detection itself put it there.
+The coordinator composes it from two sources it alone holds: the not-selected
+half of the `P2` partition, which never reaches the plan, and the rows the plan
+declared deferred. The plan writes dispositions for the candidates it received,
+so a reason about a candidate it never saw is not one it can write.
+
 ## The gate
 
 | Applies | Condition of closing | Proved by |
 |---|---|---|
-| common | the remeasured manifest equals the frozen one, except for the paths declared in the `files` of the steps | `measures[]` against `frozen_manifest_digest` |
-| common | `identity` is `true` | `preview_digest`, `applied_digest` |
+| common | the remeasured manifest equals the frozen one, except for the paths of the writing set | `measures[]` against `frozen_manifest_digest` |
 | common | every `verify:` is present and green, with its command verbatim | `steps[]` |
-| common | the full suite shows no regression per touched file and no new failure outside the pre-existing ones; that suite is `conventions.full_suite_command`, run once at the gate | `checks`, `conventions.full_suite_command` |
-| common | nothing changed outside the declared paths | the remeasured manifest and the run's diff |
+| common | the full suite shows no new failure outside the pre-existing ones, and every step's affected suite is green with those same pre-existing failures named; that full suite is `conventions.full_suite_command`, run once at the gate | `checks.full_suite`, `checks.steps[]`, `conventions.full_suite_command` |
+| common | nothing changed outside the writing set | the remeasured manifest and the run's diff |
 | common | `tests_added[]` carries a `lifecycle` for every entry | `tests_added[]` |
-| `diff` only | the change fits inside the frozen diff or inside the paths the steps declared | the frozen diff and the declared paths, against the applied change |
+| `diff` only | the change fits inside the writing set | the writing set against the applied change |
 | `diff` only | `base_ref` is present only when `tree_clean` | `tree_clean`, `base_ref` |
-| `area` only | `followups[]` enumerates every candidate not dispatched as `P3`, with its reason | `followups[]` |
+| `area` only | `followups[]` enumerates every candidate not dispatched, with the priority detection assigned it and its reason, and every priority there equals the one detection produced | `followups[].priority`, `followups[].reason` |
 
 How the gate is read:
 
 - Remeasuring the manifest and getting the frozen digest back is the proof that
   the phase did not touch what it did not declare. A different digest in a path
-  no step declared is red attributed to the phase, not to the environment.
-- The digest of the previewed change and the digest of the applied change being
-  identical is the proof that the executor applied the change that was previewed.
-  Two different digests are red attributed to the phase as well: the run is never
-  closed on a claim that the difference is cosmetic.
+  outside the writing set is red attributed to the phase, not to the environment.
+- `preview_match` is read in three ways. `null` means one or both digests are
+  missing: it is neutral for closing, and it authorizes no claim about the
+  identity of any two byte sequences. `true` means both digests exist, each with
+  the reproducible command that produced it, and they agree: evidence that the
+  change previewed is the change applied, never proof that the two are identical
+  byte for byte. `false` means both exist and differ: red attributed to the
+  phase, like any other difference no step declared.
 - Red attributed to the phase reopens the run as round 2.
 - Red attributed to the environment (an install, the runner, the machine, a
   pre-existing failure count that moved) opens no round: the phase is blocked,
   and the reason is written in the receipt. `checks` carries it in words.
-- The full suite is the one `conventions.full_suite_command` names, and the
-  affected suite of a single step is not it: green over a step's suite proves
-  the step, never the run. When the field is `none` with its justification, the
-  receipt carries the declaration, and the gate claims no green for a suite
-  nobody ran.
+- The full suite is the one `conventions.full_suite_command` names, run once at
+  the gate, and the affected suite of a single step is not it: green over a
+  step's suite proves the step, never the run. When the field is `none` with its
+  justification, the receipt carries the declaration, and the gate claims no
+  green for a suite nobody ran. A full suite that cannot be run is classified in
+  `checks.full_suite` as `environmental` or as `not_applicable` with its
+  justification; it is never recorded as an asserted green.
+
+An ordinary close proves no equivalence with a preview, and this document does
+not claim one. What sustains the close is the approval of `P4`, the paths the
+steps declared and the `verify:`s; `preview_match` is read as evidence when it
+exists and as `null` when it does not, and a run that touched none of it still
+closes on the other conditions.
 
 ## Rounds
 
@@ -195,9 +274,10 @@ the gate, never inferred from what the suite happens to run.
 ## Declared limitations
 
 - Measurement is produced by the measurement server or by the coordinator, never
-  by the planner or the executor. Their bash whitelists are closed lists with no
-  counting command and no line arithmetic, so a number either one reports is not
-  a measure.
+  by the planner or the executor. The planner's bash whitelist is a closed list
+  and no form on it counts for the receipt; the executor's bash purposes are a
+  closed list too and none of them authorizes measuring for the receipt. Neither
+  list is widened here, so a number either one reports is not a measure.
 - The overlap check needs the decision model configured by environment
   variables, as [`conventions.md`](conventions.md) describes; the repository
   commits no provider or model id. Without those values the check judges nothing
