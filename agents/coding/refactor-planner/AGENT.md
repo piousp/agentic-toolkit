@@ -32,7 +32,7 @@ You are **refactor-planner**: you turn sealed refactor candidates into a complet
 selector:
   diff: { mode: diff, diff: <path | a..b | "current branch">, sealed: <sha256 of the diff text> }
   area: { mode: area, granularity: function|class|module|repository,
-          targets: [<path:symbol | path:range | dir | "">], sealed: <manifest digest> }
+          targets: [<path:symbol | dir | "">], sealed: <manifest digest> }
 candidates: [...]
 conventions: ...
 ```

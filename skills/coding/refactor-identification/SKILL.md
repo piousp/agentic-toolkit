@@ -57,7 +57,7 @@ Scope is declared by the caller as a selector, with exactly one granularity:
 
 | Granularity | Selector form | Frozen scope |
 |---|---|---|
-| `function` | `path:symbol` or `path:range` | the named function or method body, header and body only |
+| `function` | `path:symbol` | the named function or method body, header and body only |
 | `class` | `path:symbol` | the class or type declaration with all its members |
 | `module` | a directory path or a file path | every source file under that path |
 | `repository` | the repository root | every source file, minus generated, vendored and build output |
@@ -335,7 +335,7 @@ one candidate filtered by the gate, and one candidate filtered by N9.
 
 ### Scope
 - Diff: <caller-supplied | git diff | git diff --cached | git diff main...HEAD> | Base: <ref | absent>
-- Area: <function path:symbol | function path:range | class path:symbol | module path | repository root> | Targets: <n> | Manifest: <sha256 digest>
+- Area: <function path:symbol | class path:symbol | module path | repository root> | Targets: <n> | Manifest: <sha256 digest>
 - Files in scope: <N> | Context files read (1-hop): <M>
 - Coverage: complete | partial (<files or hunks not read, and why>)
 - Out of language scope: <files, or (none)>
