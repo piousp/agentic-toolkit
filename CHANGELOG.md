@@ -11,6 +11,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `skills/*/*/SKILL.md`, `agents/*/*/AGENT.md`: a `summary:` line, the one a human reads in the index tables.
 - `skills/coding/refactor-identification/SKILL.md`: the refactor lens, rewritten for this repository with two exclusive entry modes and TypeScript only.
 - `agents/coding/refactor-planner/AGENT.md`: the refactor planner, a sibling of the code planner, which turns sealed candidates into a disposed plan with two classes of step.
+- `docs/refactor-phase.md`: the refactor phase as a state machine, with its receipt and its closure conditions.
 
 ### Changed
 
@@ -21,6 +22,8 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `AGENTS.md`, `docs/conventions.md`: `summary` documented as the human-facing line beside the routing description.
 - `skills/coding/refactor-identification/SKILL.md`, `skills/coding/refactor-identification/references/typescript.md`, `skills/coding/refactor-identification/references/examples.md`: cells neutral to the entry mode, a grouping imposed from outside excluded from the clump row, and an area-mode example.
 - `agents/coding/code-implementer/AGENT.md`: a declared `mode` of `tdd` or `refactor`, with the refactor reading of S2, S3 and STOP-3.
+- `agents/README.md`: the plan diagram shows the refactor lane, the two decisions of the caller and the phase gate.
+- `docs/roadmap.md`: the refactor phase named as the first supervised procedure of phase 8.
 
 ### Fixed
 

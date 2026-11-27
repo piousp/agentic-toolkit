@@ -74,6 +74,8 @@ Open questions to settle before designing it:
 
 Nothing is designed yet. It depends on phases 3 to 5 producing agents with stable contracts.
 
+The refactor phase documented in `docs/refactor-phase.md` is the first procedure of this kind: a freeze, six decision points and a gate, with a receipt per run.
+
 ## Out of scope
 
 - Harness plugins, extensions and themes.

@@ -16,17 +16,31 @@ will produce, before running it.
 flowchart TD
     A["Objective or ticket"] --> B["code-planner: read-only, never changes state"]
     B --> C["PLAN + TECHNICAL: steps, test plan, seams proposed"]
+    A --> N["refactor-identification: sealed diff or declared area"]
+    N --> O["Candidates RF-n: category row, evidence, priority"]
+    O --> P{"Caller selects candidates"}
+    P --> Q["refactor-planner: one disposition per candidate"]
+    Q --> C
     C --> D{"Caller confirms the seams"}
     D -- "still proposed" --> C
-    D -- "seam confirmed: seam" --> E["code-implementer: one step, S0-S7"]
+    D -- "seam confirmed: seam" --> E["code-implementer: one step, mode tdd or refactor"]
     E --> F["Evidence: red, green, affected suite, verify + four-section report"]
     F --> G{"Steps left in the plan?"}
     G -- "yes, next step" --> E
-    G -- "no" --> H["Commit, or the next objective"]
+    G -- "no" --> H{"A refactor phase?"}
+    H -- "yes" --> I["Gate: remeasured manifest, per-step verify, receipt"]
+    H -- "no" --> J["Commit, or the next objective"]
+    I --> J
 ```
 
+Two lanes feed the same plan: a change to code goes straight to the planner,
+while a refactor passes through detection first, and only the candidates the
+caller selects reach the refactor planner. A refactor phase adds a gate before
+the commit, documented in [`../docs/refactor-phase.md`](../docs/refactor-phase.md).
+
 The planner never confirms its own seams and the implementer never reopens the
-plan, so the caller makes the only decision in the loop: confirming the seams.
+plan, so the caller makes the only decisions in the loop: which candidates to
+plan and which seams to confirm.
 
 To install an agent into a harness, see [`../docs/installation.md`](../docs/installation.md).
 The list below is generated from each `AGENT.md`; rules for adding one are in
