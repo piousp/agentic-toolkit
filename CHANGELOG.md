@@ -19,6 +19,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `scripts/check_repo.py`, `tests/run_tests.sh`: fail on a `summary` longer than an index row.
 - `AGENTS.md`, `docs/conventions.md`: `summary` documented as the human-facing line beside the routing description.
 - `skills/coding/refactor-identification/SKILL.md`, `skills/coding/refactor-identification/references/typescript.md`, `skills/coding/refactor-identification/references/examples.md`: cells neutral to the entry mode, a grouping imposed from outside excluded from the clump row, and an area-mode example.
+- `agents/coding/code-implementer/AGENT.md`: a declared `mode` of `tdd` or `refactor`, with the refactor reading of S2, S3 and STOP-3.
 
 ### Fixed
 

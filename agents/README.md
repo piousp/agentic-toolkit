@@ -35,7 +35,7 @@ The list below is generated from each `AGENT.md`; rules for adding one are in
 <!-- GENERATED:BEGIN -->
 | Agent | Category | What it does |
 |---|---|---|
-| [`code-implementer`](./coding/code-implementer/AGENT.md) | `coding` | Implements one planned step, test first, and reports the evidence. |
+| [`code-implementer`](./coding/code-implementer/AGENT.md) | `coding` | Implements one planned step in a declared mode, with persisted evidence. |
 | [`code-planner`](./coding/code-planner/AGENT.md) | `coding` | Plans a change to code: decisions, contracts, test seams, ordered steps. |
 | [`analyst`](./general/analyst/AGENT.md) | `general` | Reviews an artifact against explicit criteria and labels every claim. |
 | [`planner`](./general/planner/AGENT.md) | `general` | Plans non-code work: tasks, projects, research, documents, writing. |
