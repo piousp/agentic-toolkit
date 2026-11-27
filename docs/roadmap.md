@@ -12,7 +12,7 @@ Exit criterion: a clone passes every check and one agent can be linked into a ha
 
 Each artifact is reviewed on its own: portability, frontmatter, and whether it still earns its place. Candidates from the previous repository:
 
-- Skills about writing and reviewing code: the philosophy, planning, test-first, simplification, refactor, review lenses.
+- Skills about writing and reviewing code: the philosophy, planning, test-first, simplification, review lenses (the refactor lens migrated as `refactor-identification`).
 - Skills about authoring skills.
 - Agents: analyst, worker, scout, web scout, critical thinker.
 
@@ -73,6 +73,8 @@ Open questions to settle before designing it:
 - How a run is audited after the fact: which evidence is kept, and for how long.
 
 Nothing is designed yet. It depends on phases 3 to 5 producing agents with stable contracts.
+
+The refactor phase documented in `docs/refactor-phase.md` is the first procedure of this kind: a freeze, six decision points and a gate, with a receipt per run.
 
 ## Out of scope
 

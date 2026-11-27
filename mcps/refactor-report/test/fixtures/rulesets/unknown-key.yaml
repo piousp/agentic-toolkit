@@ -1,0 +1,10 @@
+version: 1
+language: typescript
+thresholds:
+  max_complexity: 10
+rules:
+  - id: http-status-const
+    kind: extract-const
+    description: Hoist one matched string literal into a module-level const.
+    match: { literal: string, value: "200" }
+    params: { name: STATUS_OK }

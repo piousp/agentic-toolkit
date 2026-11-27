@@ -1,0 +1,8 @@
+version: 1
+language: typescript
+rules:
+  - id: extract-inline
+    kind: extract-inline
+    description: Wrap a set of declarations in an inline namespace.
+    match: { declarations: [parseTicket] }
+    params: { namespace: Ticket }

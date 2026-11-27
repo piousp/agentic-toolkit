@@ -1,0 +1,3 @@
+version: 1
+language: typescript
+rules: @extract-const

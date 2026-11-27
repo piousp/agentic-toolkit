@@ -6,9 +6,14 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 
 ### Added
 
+- `mcps/refactor-report/`: the measurement server, which measures a frozen scope and previews a refactor without writing.
+
 - `docs/installation.md`: how to install skills and agents, with the pre-push hook and the overlap check.
 - `tests/fixtures/summary-bad/`: fixture for the summary length check.
 - `skills/*/*/SKILL.md`, `agents/*/*/AGENT.md`: a `summary:` line, the one a human reads in the index tables.
+- `skills/coding/refactor-identification/SKILL.md`: the refactor lens, rewritten for this repository with two exclusive entry modes and TypeScript only.
+- `agents/coding/refactor-planner/AGENT.md`: the refactor planner, a sibling of the code planner, which turns sealed candidates into a disposed plan with two classes of step.
+- `docs/refactor-phase.md`: the refactor phase as a state machine, with its receipt and its closure conditions.
 
 ### Changed
 
@@ -17,10 +22,46 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `scripts/gen_index.py`: the index tables show each artifact's `summary:`, falling back to the first sentence of `description`.
 - `scripts/check_repo.py`, `tests/run_tests.sh`: fail on a `summary` longer than an index row.
 - `AGENTS.md`, `docs/conventions.md`: `summary` documented as the human-facing line beside the routing description.
+- `skills/coding/refactor-identification/SKILL.md`, `skills/coding/refactor-identification/references/typescript.md`, `skills/coding/refactor-identification/references/examples.md`: cells neutral to the entry mode, a grouping imposed from outside excluded from the clump row, and an area-mode example.
+- `agents/coding/code-implementer/AGENT.md`: a declared `mode` of `tdd` or `refactor`, with the refactor reading of S2, S3 and STOP-3.
+- `agents/README.md`: the plan diagram shows the refactor lane, the two decisions of the caller and the phase gate.
+- `skills/coding/refactor-identification/SKILL.md`, `agents/coding/refactor-planner/AGENT.md`: the function selector names a symbol, not a line range, matching what the measurement server can resolve.
+- `docs/roadmap.md`: the refactor phase named as the first supervised procedure of phase 8.
+- `agents/coding/refactor-planner/AGENT.md`: a step declares every path it touches, the test file included, because the gate reads the declared paths and nothing else.
+- `docs/refactor-phase.md`: the diff closure admits the paths the steps declared, so a step that adds a test can close.
+- `skills/coding/refactor-identification/SKILL.md`: the area class comes from where the fix is produced, not from the files the run already opened, and every finding records its basis.
+- `skills/coding/refactor-identification/references/examples.md`: the area example argues its classes from the production locality of each fix.
+- `docs/refactor-phase.md`: `conventions` is produced at `P0`, consumed sealed at `P3`, recorded in the receipt and read at the gate for the full suite it names.
+- `agents/coding/refactor-planner/AGENT.md`: the four facts `conventions` carries, and one rule for a `conventions` that is missing a fact.
+- `agents/coding/code-implementer/AGENT.md`: the test framework and the test class come from the plan, and the full suite is never inferred.
+- `docs/refactor-phase.md`: `preview_match` replaces the identity condition of closing, and the preview digest becomes optional evidence.
+- `docs/refactor-phase.md`: `P2` records a partition, and a follow-up keeps the priority detection gave it with its reason.
+- `docs/refactor-phase.md`: the anchor, the one-hop radius and the writing set are separate, and closing compares against the writing set.
+- `docs/refactor-phase.md`: a step's dispatch carries the literal `seam confirmed` line, and `checks` keeps the step suites and the full suite apart.
+- `agents/coding/refactor-planner/AGENT.md`: a disposition names the detected priority, a gate row is never re-adjudicated and a candidate is never discarded here.
+- `agents/coding/refactor-planner/AGENT.md`: the writing set governs a write, the whitelist drops its counting forms and `Surgical Changes` returns to the order.
+- `agents/coding/code-implementer/AGENT.md`: the refactor mode reads each state through the row of its class, a null refactor is read from the structural evidence, and the TDD rules are scoped to `tdd`.
+- `agents/coding/code-implementer/AGENT.md`, `agents/coding/code-implementer/references/tests.md`: the structure-reading anti-pattern is scoped to `tdd`, and a step of either planner names its result by mode.
+- `agents/coding/refactor-planner/AGENT.md`: a step declares its `structure_check` and covers its candidate as `RF-n`.
+- `docs/refactor-phase.md`: the receipt records the structural observable of a refactor step, and the execution state names it.
+- `docs/refactor-phase.md`: the measurement receipt is the `measures[]` block `P1` produces, the receipt records the unresolved findings and one frozen digest with two readings, and the preview digests are named against the server's field.
+- `agents/coding/refactor-planner/AGENT.md`: a cited number names its `measures[]` entry, and an unresolved finding is blocked instead of disposed.
 
 ### Fixed
 
 - `skills/coding/pablo-coding-style/SKILL.md`: quote the summary so the YAML frontmatter parses.
+- `mcps/refactor-report/src/scope.ts`: a changed file outside the measured languages is named in `skipped` instead of aborting the whole run in diff mode.
+- `scripts/check_links.py`: skip installed dependencies, whose own READMEs link files they do not ship, so the check survives an installed tree.
+- `agents/coding/code-planner/AGENT.md`, `agents/general/planner/AGENT.md`: quote the `summary:` value so the frontmatter parses without lenient recovery.
+- `mcps/refactor-report/src/server.ts`: refuse an argument the schema rejects with the typed `PARAM_INVALID` body, which the transport's own prose was hiding.
+- `mcps/refactor-report/src/contracts.ts`: leave the scope mode optional, so a request carrying none reaches the resolver and answers `SCOPE_MISSING`.
+- `mcps/refactor-report/src/contracts.ts`: write an evidence command against the root it is measured from instead of the package's own `dist/`.
+- `mcps/refactor-report/src/git.ts`: list the diff relative to the workspace, so a workspace below the repository root can be measured.
+- `mcps/refactor-report/src/measure.ts`, `mcps/refactor-report/src/preview.ts`: emit every evidence command of both verbs against the measured root.
+- `mcps/refactor-report/src/measure.ts`: refuse a selector path or a diff path that climbs out of the root with `PATH_OUTSIDE_ROOT`.
+- `mcps/refactor-report/test-protocol/stdio.ts`, `mcps/refactor-report/test-cli/roundtrip.ts`: cover the typed refusals, the diff below the repository root and the evidence round trip of both verbs.
+- `mcps/README.md`: drop the line that said nothing is published, now that a server is.
+- `docs/refactor-phase.md`, `skills/coding/refactor-identification/SKILL.md`: a receipt entry names the metric it measures, a run with no preview says so, the gate reads a declared path that is not tracked yet, and the skill fixes the repository selector form and the anchor of its manifest.
 
 ## 2026-11-26
 

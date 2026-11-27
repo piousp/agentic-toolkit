@@ -65,11 +65,13 @@ tests/run_tests.sh
 <!-- GENERATED:BEGIN -->
 - `agents/coding/code-implementer/AGENT.md`
 - `agents/coding/code-planner/AGENT.md`
+- `agents/coding/refactor-planner/AGENT.md`
 - `agents/general/analyst/AGENT.md`
 - `agents/general/planner/AGENT.md`
 - `agents/research/scout/AGENT.md`
 - `agents/research/web-scout/AGENT.md`
 - `skills/coding/pablo-coding-style/SKILL.md`
+- `skills/coding/refactor-identification/SKILL.md`
 - `skills/general/pablo-goal-discovery/SKILL.md`
 - `skills/general/writing-agent-skills/SKILL.md`
 - `skills/pi-tooling/find-pi-session/SKILL.md`

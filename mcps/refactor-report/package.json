@@ -1,0 +1,32 @@
+{
+  "name": "refactor-report",
+  "version": "0.0.0",
+  "private": true,
+  "description": "MCP server that measures and previews TypeScript refactorings without writing to disk.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "test": "node --test",
+    "test:protocol": "npm run build && node --test test-protocol/stdio.ts",
+    "test:cli": "npm run build && node --test test-cli/roundtrip.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.4.0",
+    "typescript": "^5",
+    "yaml": "^2",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "typescript": "^5"
+  },
+  "files": [
+    "dist",
+    "rulesets",
+    "README.md"
+  ]
+}

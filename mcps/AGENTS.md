@@ -24,5 +24,5 @@ No `node_modules`, no build output, no bundled binaries. The README states the i
 ## Index
 
 <!-- GENERATED:BEGIN -->
-_Nothing yet._
+- `mcps/refactor-report/README.md`
 <!-- GENERATED:END -->
