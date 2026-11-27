@@ -70,6 +70,7 @@ tests/run_tests.sh
 - `agents/research/scout/AGENT.md`
 - `agents/research/web-scout/AGENT.md`
 - `skills/coding/pablo-coding-style/SKILL.md`
+- `skills/coding/refactor-identification/SKILL.md`
 - `skills/general/pablo-goal-discovery/SKILL.md`
 - `skills/general/writing-agent-skills/SKILL.md`
 - `skills/pi-tooling/find-pi-session/SKILL.md`

@@ -17,6 +17,7 @@ list below is generated from each `SKILL.md`; rules for adding one are in
 | Skill | Category | What it does |
 |---|---|---|
 | [`pablo-coding-style`](./coding/pablo-coding-style/SKILL.md) | `coding` | The rules behind the code: YAGNI, KISS, DRY, SOLID, and small surgical edits. |
+| [`refactor-identification`](./coding/refactor-identification/SKILL.md) | `coding` | Quantifies structural refactor candidates in a diff or a declared code area. |
 | [`pablo-goal-discovery`](./general/pablo-goal-discovery/SKILL.md) | `general` | Turns a vague ask into a confirmed goal through numbered decisions. |
 | [`writing-agent-skills`](./general/writing-agent-skills/SKILL.md) | `general` | How to write, tighten and retire an agent skill, from frontmatter to tests. |
 | [`find-pi-session`](./pi-tooling/find-pi-session/SKILL.md) | `pi-tooling` | Finds the current pi session directory so run artifacts land beside it. |

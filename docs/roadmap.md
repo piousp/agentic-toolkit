@@ -12,7 +12,7 @@ Exit criterion: a clone passes every check and one agent can be linked into a ha
 
 Each artifact is reviewed on its own: portability, frontmatter, and whether it still earns its place. Candidates from the previous repository:
 
-- Skills about writing and reviewing code: the philosophy, planning, test-first, simplification, refactor, review lenses.
+- Skills about writing and reviewing code: the philosophy, planning, test-first, simplification, review lenses (the refactor lens migrated as `refactor-identification`).
 - Skills about authoring skills.
 - Agents: analyst, worker, scout, web scout, critical thinker.
 

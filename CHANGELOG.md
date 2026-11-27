@@ -9,6 +9,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `docs/installation.md`: how to install skills and agents, with the pre-push hook and the overlap check.
 - `tests/fixtures/summary-bad/`: fixture for the summary length check.
 - `skills/*/*/SKILL.md`, `agents/*/*/AGENT.md`: a `summary:` line, the one a human reads in the index tables.
+- `skills/coding/refactor-identification/SKILL.md`: the refactor lens, rewritten for this repository with two exclusive entry modes and TypeScript only.
 
 ### Changed
 

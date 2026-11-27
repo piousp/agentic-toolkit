@@ -26,7 +26,7 @@ works too. `python3` 3.9 or newer runs the repository checks.
 <!-- GENERATED:BEGIN -->
 | Category | Agents | Skills |
 |---|---|---|
-| `coding` | 2 | 1 |
+| `coding` | 2 | 2 |
 | `general` | 2 | 2 |
 | `pi-tooling` | 0 | 1 |
 | `research` | 2 | 0 |
