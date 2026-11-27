@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import ts from "typescript";
 
 import type { ParsedFile } from "./parse.ts";
@@ -16,10 +18,36 @@ export type TextEdit = {
 
 export type TransformOutcome = {
   readonly edits: readonly TextEdit[];
+  readonly modules: readonly ModuleCreation[];
   readonly text: string;
 };
 
-export type Transform = (parsed: ParsedFile, rule: RulesetRule) => readonly TextEdit[];
+// D7: a module this rule would create beside the origin. Its bytes are not a range of
+// the origin text, so they travel next to the edits instead of inside them.
+export type ModuleCreation = {
+  readonly rule: string;
+  readonly path: string;
+  readonly text: string;
+};
+
+// D7: the destination is a file of the measured tree and only the entry knows that
+// tree, so the existence of the destination is a dependency and never a read of this
+// module's own. A probe that answers no for a tree with nothing in it is how the unit
+// cases call the transform.
+export type TransformDeps = {
+  readonly targetExists: (relativePath: string) => boolean;
+};
+
+export type TransformResult = {
+  readonly edits: readonly TextEdit[];
+  readonly modules: readonly ModuleCreation[];
+};
+
+export type Transform = (
+  parsed: ParsedFile,
+  rule: RulesetRule,
+  deps: TransformDeps,
+) => TransformResult;
 
 function stringOf(
   record: Readonly<Record<string, unknown>>,
@@ -83,13 +111,13 @@ function lineBreakOf(text: string): string {
 // R5/R6: `extract-const` lifts every literal carrying the matched value into one
 // module-level const and leaves a reference in each place. Both halves are ranges of
 // the original text, so nothing outside them is rewritten.
-export function extractConst(parsed: ParsedFile, rule: RulesetRule): readonly TextEdit[] {
+export function extractConst(parsed: ParsedFile, rule: RulesetRule): TransformResult {
   const value = matchedValueOf(rule);
   const name = constNameOf(rule);
   const literals = literalsValued(parsed.sourceFile, value);
   const first = literals[0];
   if (first === undefined) {
-    return [];
+    return { edits: [], modules: [] };
   }
 
   const lineBreak = lineBreakOf(parsed.sourceFile.getFullText());
@@ -106,13 +134,143 @@ export function extractConst(parsed: ParsedFile, rule: RulesetRule): readonly Te
       text: name,
     });
   }
-  return edits;
+  return { edits, modules: [] };
+}
+
+// R7/D7: the destination is written with the extension the origin already uses unless
+// the rule spells one, so a .tsx origin never lands its JSX in a .ts module.
+const MODULE_EXTENSIONS: ReadonlySet<string> = new Set([".ts", ".tsx", ".mts", ".cts"]);
+
+function destinationOf(originPath: string, target: string): string {
+  const directory = path.posix.dirname(originPath);
+  const spelled = path.posix.extname(target);
+  const extension = MODULE_EXTENSIONS.has(spelled)
+    ? ""
+    : MODULE_EXTENSIONS.has(path.posix.extname(originPath))
+      ? path.posix.extname(originPath)
+      : ".ts";
+  return path.posix.normalize(path.posix.join(directory, `${target}${extension}`));
+}
+
+// D7: a movable unit is a top-level declaration of a value, named once. A variable
+// statement that declares several names is not moved by a rule that can only name one
+// of them, and a statement that declares no name is not a unit at all.
+function valueDeclarationOf(node: ts.Statement): string | undefined {
+  if (
+    ts.isFunctionDeclaration(node) ||
+    ts.isClassDeclaration(node) ||
+    ts.isEnumDeclaration(node)
+  ) {
+    return node.name?.text;
+  }
+  if (ts.isVariableStatement(node)) {
+    const declarations = node.declarationList.declarations;
+    const name = declarations.length === 1 ? declarations[0]?.name : undefined;
+    return name !== undefined && ts.isIdentifier(name) ? name.text : undefined;
+  }
+  return undefined;
+}
+
+function typeDeclarationOf(node: ts.Statement): string | undefined {
+  return ts.isTypeAliasDeclaration(node) || ts.isInterfaceDeclaration(node)
+    ? node.name.text
+    : undefined;
+}
+
+function lineOf(parsed: ParsedFile, node: ts.Node): number {
+  return (
+    parsed.sourceFile.getLineAndCharacterOfPosition(node.getStart(parsed.sourceFile)).line + 1
+  );
+}
+
+function movedNamesOf(rule: RulesetRule): readonly string[] {
+  const declarations = rule.match.declarations;
+  const names = Array.isArray(declarations) ? declarations : [];
+  if (names.length === 0 || !names.every((name) => typeof name === "string" && name !== "")) {
+    throw new WorkspaceError(
+      "RULESET_INVALID",
+      `${rule.id}: kind extract-module moves the top-level declarations match.declarations names, and it carries ${JSON.stringify(declarations)}`,
+    );
+  }
+  return names as readonly string[];
+}
+
+// The destination has to export what the origin re-exports: a declaration that already
+// carried the modifier keeps it, and one the origin kept private gains one.
+function exportedText(parsed: ParsedFile, statement: ts.Statement): string {
+  const text = statement.getText(parsed.sourceFile);
+  return text.startsWith("export ") ? text : `export ${text}`;
+}
+
+// D7: `extract-module` moves the named top-level value declarations into their own
+// module and leaves the origin re-exporting them from the first range it gave up, so
+// every module that imports the origin keeps resolving and none of them is rewritten.
+// A type is excluded in v1 and refused by name instead of reported as an empty edit.
+export function extractModule(
+  parsed: ParsedFile,
+  rule: RulesetRule,
+  deps: TransformDeps,
+): TransformResult {
+  const names = movedNamesOf(rule);
+  const target = stringOf(rule.params, "target", rule, "params.");
+  const destination = destinationOf(parsed.path, target);
+  if (deps.targetExists(destination)) {
+    throw new WorkspaceError(
+      "TARGET_EXISTS",
+      `${rule.id} moves ${names.join(", ")} to ${destination}, which is already in the tree: an existing module is never overwritten`,
+    );
+  }
+
+  const claimed: ts.Statement[] = [];
+  const exported: string[] = [];
+  for (const name of names) {
+    const value = parsed.sourceFile.statements.find(
+      (node) => valueDeclarationOf(node) === name,
+    );
+    if (value !== undefined) {
+      claimed.push(value);
+      exported.push(name);
+      continue;
+    }
+    const type = parsed.sourceFile.statements.find(
+      (node) => typeDeclarationOf(node) === name,
+    );
+    if (type !== undefined) {
+      throw new WorkspaceError(
+        "SYMBOL_NOT_FOUND",
+        `${rule.id} names ${name}, and ${parsed.path} declares it as a type: v1 moves top-level value declarations only, and a declaration this server cannot move is never reported as an empty edit`,
+        [`${parsed.path}:${lineOf(parsed, type)}`],
+      );
+    }
+  }
+  if (claimed.length === 0) {
+    return { edits: [], modules: [] };
+  }
+
+  const ordered = [...claimed].sort(
+    (left, right) => left.getStart(parsed.sourceFile) - right.getStart(parsed.sourceFile),
+  );
+  const lineBreak = lineBreakOf(parsed.sourceFile.getFullText());
+  const reExport = `export { ${exported.join(", ")} } from ${JSON.stringify(target)};`;
+  const edits: TextEdit[] = ordered.map((statement, index) => ({
+    rule: rule.id,
+    start: statement.getStart(parsed.sourceFile),
+    end: statement.getEnd(),
+    text: index === 0 ? reExport : "",
+  }));
+  const moved = ordered.map((statement) => `${exportedText(parsed, statement)}${lineBreak}`);
+
+  return {
+    edits,
+    modules: [{ rule: rule.id, path: destination, text: moved.join(lineBreak) }],
+  };
 }
 
 // D6: the registry is closed. A kind is a key of this map and nothing else, and
 // `RulesetKind` is the one enum both the ruleset loader and this module read.
 export const TRANSFORM_REGISTRY: ReadonlyMap<RulesetKind, Transform> = new Map([
   ["extract-const", extractConst],
+  ["extract-module", extractModule],
 ]);
 
 export function transformFor(kind: RulesetKind): Transform {
@@ -176,10 +334,14 @@ export function applyEdits(text: string, edits: readonly TextEdit[]): string {
 export function transformFile(
   parsed: ParsedFile,
   rules: readonly RulesetRule[],
+  deps: TransformDeps,
 ): TransformOutcome {
   const edits: TextEdit[] = [];
+  const modules: ModuleCreation[] = [];
   for (const rule of rules) {
-    edits.push(...transformFor(rule.kind)(parsed, rule));
+    const result = transformFor(rule.kind)(parsed, rule, deps);
+    edits.push(...result.edits);
+    modules.push(...result.modules);
   }
-  return { edits, text: applyEdits(parsed.sourceFile.getFullText(), edits) };
+  return { edits, modules, text: applyEdits(parsed.sourceFile.getFullText(), edits) };
 }
