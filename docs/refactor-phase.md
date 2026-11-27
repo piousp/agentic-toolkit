@@ -164,11 +164,11 @@ and never in the target repository:
   "tree_clean": "<true|false>",
   "base_ref": "<ref|absent>",
   "conventions": {"test_framework": "<value> at <path:line>", "test_layout_naming": "<value> at <path:line>", "source_layout_naming": "<value> at <path:line>", "full_suite_command": "<command> at <path:line>|none, justification"},
-  "measures": [{"path": "<path>", "sha256": "<digest>", "loc": "<n>", "command": "<verbatim>"}],
+  "measures": [{"path": "<path>", "sha256": "<digest>", "measure": "<loc|occurrences|activity|the name detection uses>", "value": "<n>", "command": "<verbatim>"}],
   "preview_match": "<true|false|null>",
   "preview_digest": "<digest of the previewed change, or null when nothing was previewed>",
   "applied_digest": "<digest of the applied change, or null when nothing was applied>",
-  "ruleset": "<file>#sha256:<12> of the transformation ruleset the preview used>",
+  "ruleset": "<file>#sha256:<12> of the transformation ruleset the preview used|none, when no preview ran>",
   "steps": [{"n": "<step>", "verify": "<verbatim verify: text>", "command": "<verbatim>", "status": "<pass|fail|blocked>", "structure_check": "<the deterministic command or read, and the fact it reads>|none", "null_refactor": "<true|false|null>|none"}],
   "checks": {"steps": [{"n": "<step>", "affected_suite": "<command and result per touched file>", "preexisting_failures": "<names and counts>"}], "full_suite": {"command": "<conventions.full_suite_command>", "status": "<pass|fail|not_applicable|environmental>", "result": "<counts and failing tests>", "justification": "<why it did not run, when it did not>"}},
   "tests_added": [{"path": "<path>", "kind": "<architecture|characterization>", "lifecycle": "<keep|retire|pending-decision>"}],
@@ -186,17 +186,18 @@ it is the sha256 of the sealed diff text.
 
 `measures[]` is the measurement receipt, the block every number the plan cites
 comes from. Its entries are produced at `P1`, as detection measures the frozen
-scope, and each holds the number measured, the path it belongs to and the exact
-command that reproduces it; the block is not remade in a later state, and the
-manifest the gate remeasures at `P6` is appended to it instead of written over
-the entries `P1` recorded. A number the plan cites and that no entry of this
-block holds is marked `[UNVERIFIED]`, never recomputed. `conventions` is the
-object `P0` produced, recorded whole with the four facts, the value of each and
-its evidence, so the gate can name the full suite it ran and an audit can read
-the plan against the facts it consumed.
+scope, and each holds what was measured in `measure`, the number in `value`, the
+path it belongs to and the exact command that reproduces it; the block is not
+remade in a later state, and the manifest the gate remeasures at `P6` is
+appended to it instead of written over the entries `P1` recorded. A number the
+plan cites and that no entry of this block holds is marked `[UNVERIFIED]`, never
+recomputed. `conventions` is the object `P0` produced, recorded whole with the
+four facts, the value of each and its evidence, so the gate can name the full
+suite it ran and an audit can read the plan against the facts it consumed.
 `ruleset` names the transformation ruleset the preview read, by the
 first twelve characters of its digest, so a run that changed the rules is a
-different run. `steps[]` holds each step's `verify:` text
+different run; a run that previewed nothing writes `none`, and a missing preview
+invalidates no condition of closing. `steps[]` holds each step's `verify:` text
 and the command that showed it, so the gate can be repeated from the receipt. In
 `mode: refactor` each entry also carries the two fields of the structural
 observable the executor produced: `structure_check`, the deterministic command
@@ -238,7 +239,7 @@ candidate: it never receives a disposition, and no step of `steps[]` names one.
 
 | Applies | Condition of closing | Proved by |
 |---|---|---|
-| common | the remeasured manifest equals the frozen one, except for the paths of the writing set | `measures[]` against `frozen_digest`: the sha256 of the manifest at freeze in `area` mode, the sha256 of the sealed diff text in `diff` mode |
+| common | the remeasured manifest equals the frozen one, except for the paths of the writing set | `measures[]` (`path`, `sha256`) against `frozen_digest`: the sha256 of the manifest at freeze in `area` mode, the sha256 of the sealed diff text in `diff` mode |
 | common | every `verify:` is present and green, with its command verbatim | `steps[]` |
 | common | the full suite shows no new failure outside the pre-existing ones, and every step's affected suite is green with those same pre-existing failures named; that full suite is `conventions.full_suite_command`, run once at the gate | `checks.full_suite`, `checks.steps[]`, `conventions.full_suite_command` |
 | common | nothing changed outside the writing set | the remeasured manifest and the run's diff |
@@ -253,6 +254,9 @@ How the gate is read:
 - Remeasuring the manifest and getting the frozen digest back is the proof that
   the phase did not touch what it did not declare. A different digest in a path
   outside the writing set is red attributed to the phase, not to the environment.
+- A path a step declared that is not tracked yet, a new test file for instance, is
+  read from `git status --porcelain` and compared against the writing set like
+  every other path.
 - `preview_match` is read in three ways. `null` means one or both digests are
   missing: it is neutral for closing, and it authorizes no claim about the
   identity of any two byte sequences. `true` means both digests exist, each with

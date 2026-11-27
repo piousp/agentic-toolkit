@@ -60,10 +60,13 @@ Scope is declared by the caller as a selector, with exactly one granularity:
 | `function` | `path:symbol` | the named function or method body, header and body only |
 | `class` | `path:symbol` | the class or type declaration with all its members |
 | `module` | a directory path or a file path | every source file under that path |
-| `repository` | the repository root | every source file, minus generated, vendored and build output |
+| `repository` | the empty string, `""`, dispatched as `targets: [""]` for the repository root | every source file, minus generated, vendored and build output |
 
 - The selector is used as given. A run never widens it, never adds a second selector, and never
   mixes it with a diff.
+- The anchor is sealed with the manifest of the repository's tracked files, the ones
+  `git ls-files` reports; a tracked file of another language is `out of language scope` in the
+  scope table and originates no candidates.
 - The anchor in this mode is a line inside the frozen selector. A line outside it anchors nothing,
   even when it holds an identical copy of the smell.
 - A symbol that resolves to no declaration, or to more than one, emits the Blocked form and stops.
@@ -376,6 +379,7 @@ one candidate filtered by the gate, and one candidate filtered by N9.
 ### Filtered out
 - <smell> at `file:line`, filtered by N<k> (<one line>)[; copies differ: <what>]
 - <smell> at `file:line`, below threshold (<measure>; needs <threshold>)
+- <smell> at `file:line`, excluded by its row's own clause: "Does not count: <the clause, e.g. a logger>" (<one line>)
 - (none)
 
 ### Summary: <N> candidates (<x> P1, <y> P2, <z> P3), <u> unresolved, <k> filtered out

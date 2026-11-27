@@ -61,6 +61,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `mcps/refactor-report/src/measure.ts`: refuse a selector path or a diff path that climbs out of the root with `PATH_OUTSIDE_ROOT`.
 - `mcps/refactor-report/test-protocol/stdio.ts`, `mcps/refactor-report/test-cli/roundtrip.ts`: cover the typed refusals, the diff below the repository root and the evidence round trip of both verbs.
 - `mcps/README.md`: drop the line that said nothing is published, now that a server is.
+- `docs/refactor-phase.md`, `skills/coding/refactor-identification/SKILL.md`: a receipt entry names the metric it measures, a run with no preview says so, the gate reads a declared path that is not tracked yet, and the skill fixes the repository selector form and the anchor of its manifest.
 
 ## 2026-11-26
 
