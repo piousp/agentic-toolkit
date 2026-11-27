@@ -44,6 +44,8 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `agents/coding/code-implementer/AGENT.md`, `agents/coding/code-implementer/references/tests.md`: the structure-reading anti-pattern is scoped to `tdd`, and a step of either planner names its result by mode.
 - `agents/coding/refactor-planner/AGENT.md`: a step declares its `structure_check` and covers its candidate as `RF-n`.
 - `docs/refactor-phase.md`: the receipt records the structural observable of a refactor step, and the execution state names it.
+- `docs/refactor-phase.md`: the measurement receipt is the `measures[]` block `P1` produces, the receipt records the unresolved findings and one frozen digest with two readings, and the preview digests are named against the server's field.
+- `agents/coding/refactor-planner/AGENT.md`: a cited number names its `measures[]` entry, and an unresolved finding is blocked instead of disposed.
 
 ### Fixed
 

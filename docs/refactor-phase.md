@@ -15,7 +15,7 @@ contract and not by its files.
 
 | Party | Artifact | Does | Never does |
 |---|---|---|---|
-| Coordinator | the dispatch and the receipt | freezes and seals the scope, dispatches one step per run, runs the gate, writes the receipt | edit the target inside a step, replan a red step by hand |
+| Coordinator | the dispatch and the receipt | freezes and seals the scope, produces `conventions` at `P0`, dispatches one step per run, runs the gate, writes the receipt | edit the target inside a step, replan a red step by hand |
 | Detection | `refactor-identification` skill | produces `RF-n` rows with evidence, measure and priority inside the frozen scope | execute, or widen the scope |
 | Planner | `refactor-planner` agent | one disposition per candidate, ordered steps with a test line and a `verify:` | derive or reseal the selector, measure, apply, persist the plan |
 | Executor | `code-implementer` agent | one step per run, entry `mode: refactor` declared in the dispatch | measure, write the receipt, run the gate, open the next step |
@@ -160,7 +160,7 @@ and never in the target repository:
   "mode": "<diff|area>",
   "selector": "<the sealed selector, verbatim>",
   "round": "<1|2>",
-  "frozen_manifest_digest": "<sha256 of the manifest at freeze>",
+  "frozen_digest": "<area: sha256 of the manifest at freeze; diff: sha256 of the sealed diff text>",
   "tree_clean": "<true|false>",
   "base_ref": "<ref|absent>",
   "conventions": {"test_framework": "<value> at <path:line>", "test_layout_naming": "<value> at <path:line>", "source_layout_naming": "<value> at <path:line>", "full_suite_command": "<command> at <path:line>|none, justification"},
@@ -173,16 +173,27 @@ and never in the target repository:
   "checks": {"steps": [{"n": "<step>", "affected_suite": "<command and result per touched file>", "preexisting_failures": "<names and counts>"}], "full_suite": {"command": "<conventions.full_suite_command>", "status": "<pass|fail|not_applicable|environmental>", "result": "<counts and failing tests>", "justification": "<why it did not run, when it did not>"}},
   "tests_added": [{"path": "<path>", "kind": "<architecture|characterization>", "lifecycle": "<keep|retire|pending-decision>"}],
   "followups": [{"rf": "<RF-n>", "priority": "<as detected: P1|P2|P3>", "reason": "<human-selection|detected-P3>", "why": "<reason it was not dispatched>"}],
+  "unresolved": [{"rf": "<RF-U<n>>", "where": "<path:line>", "missing": "<the one fact that is missing>"}],
   "verdict": "<green|red-attributable|red-environmental>",
   "emitter": "<coordinator>",
   "emitted_at": "<ISO-8601 timestamp>"
 }
 ```
 
-`measures[]` holds the manifest as remeasured, each entry with the command that
-produced it. `conventions` is the object `P0` produced, recorded whole with the
-four facts, the value of each and its evidence, so the gate can name the full
-suite it ran and an audit can read the plan against the facts it consumed.
+`frozen_digest` carries one value under two readings and never both at once: in
+`area` mode it is the sha256 of the manifest of the selector, and in `diff` mode
+it is the sha256 of the sealed diff text.
+
+`measures[]` is the measurement receipt, the block every number the plan cites
+comes from. Its entries are produced at `P1`, as detection measures the frozen
+scope, and each holds the number measured, the path it belongs to and the exact
+command that reproduces it; the block is not remade in a later state, and the
+manifest the gate remeasures at `P6` is appended to it instead of written over
+the entries `P1` recorded. A number the plan cites and that no entry of this
+block holds is marked `[UNVERIFIED]`, never recomputed. `conventions` is the
+object `P0` produced, recorded whole with the four facts, the value of each and
+its evidence, so the gate can name the full suite it ran and an audit can read
+the plan against the facts it consumed.
 `ruleset` names the transformation ruleset the preview read, by the
 first twelve characters of its digest, so a run that changed the rules is a
 different run. `steps[]` holds each step's `verify:` text
@@ -198,7 +209,11 @@ there was no `structure_check` to compare. In `mode: tdd` both are registered
 `null` when one or both are missing, `true` when both exist and agree, `false`
 when both exist and differ. `preview_digest` and `applied_digest` are optional
 evidence, recorded only when the run previewed a change through the server and
-applied it; their absence is a missing witness, not a failed run.
+applied it; their absence is a missing witness, not a failed run. The
+`preview_digest` of the receipt is the `change_digest` the server returns for the
+projected change, and `applied_digest` is that same digest computed over the
+applied change; the receipt keeps its two names and never restates the server's
+field.
 
 `checks` keeps two kinds of evidence apart. `checks.steps[]` holds each step's
 affected suite with the pre-existing failures it inherited, because that suite
@@ -215,11 +230,15 @@ half of the `P2` partition, which never reaches the plan, and the rows the plan
 declared deferred. The plan writes dispositions for the candidates it received,
 so a reason about a candidate it never saw is not one it can write.
 
+`unresolved[]` holds every finding detection could not resolve, `RF-U<n>`, with
+its location and the one fact that is missing. Such a finding is not a
+candidate: it never receives a disposition, and no step of `steps[]` names one.
+
 ## The gate
 
 | Applies | Condition of closing | Proved by |
 |---|---|---|
-| common | the remeasured manifest equals the frozen one, except for the paths of the writing set | `measures[]` against `frozen_manifest_digest` |
+| common | the remeasured manifest equals the frozen one, except for the paths of the writing set | `measures[]` against `frozen_digest`: the sha256 of the manifest at freeze in `area` mode, the sha256 of the sealed diff text in `diff` mode |
 | common | every `verify:` is present and green, with its command verbatim | `steps[]` |
 | common | the full suite shows no new failure outside the pre-existing ones, and every step's affected suite is green with those same pre-existing failures named; that full suite is `conventions.full_suite_command`, run once at the gate | `checks.full_suite`, `checks.steps[]`, `conventions.full_suite_command` |
 | common | nothing changed outside the writing set | the remeasured manifest and the run's diff |
@@ -227,6 +246,7 @@ so a reason about a candidate it never saw is not one it can write.
 | `diff` only | the change fits inside the writing set | the writing set against the applied change |
 | `diff` only | `base_ref` is present only when `tree_clean` | `tree_clean`, `base_ref` |
 | `area` only | `followups[]` enumerates every candidate not dispatched, with the priority detection assigned it and its reason, and every priority there equals the one detection produced | `followups[].priority`, `followups[].reason` |
+| `area` only | `unresolved[]` enumerates every `RF-U<n>` detection reported, with its location and the fact that is missing, and no step of `steps[]` names one | `unresolved[]`, `steps[]` |
 
 How the gate is read:
 
