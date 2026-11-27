@@ -59,7 +59,7 @@ The caller selects the runner, `bash` or a named test tool; never switch mid-run
 
 `codemode` groups independent reads, writes and runs into one script: it changes how many tool calls a step takes, never which steps exist or what evidence they produce.
 
-The affected suite is the one the caller names; otherwise the first-hop importers of the target file; `suite=none` when neither exists.
+The affected suite is the one the caller names; otherwise the first-hop importers of the target file; `suite=none` when neither exists. The test framework and the test class a step extends come from the plan's `conventions`. The affected suite is not the full suite and you never infer the full suite: the gate runs it from `conventions.full_suite_command`.
 
 ## Persistent state
 

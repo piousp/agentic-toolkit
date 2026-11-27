@@ -223,8 +223,9 @@ the closest row.
 
 ## Priority assignment
 
-The cascade depends on the mode: diff mode reads the branch, area mode reads the frozen scope.
-Within a run, assign only by the table of that mode, and stop at the first match.
+The cascade depends on the mode: diff mode reads the branch, area mode reads where the fix is
+produced relative to the frozen selector. Within a run, assign only by the table of that mode, and
+stop at the first match.
 
 ### Cascade in diff mode
 
@@ -244,13 +245,26 @@ reached, outside the 1-hop radius.
 
 ### Class and order in area mode
 
-Part one fixes the class with no metrics at all:
+Part one fixes the class from the fix's production locality, with no metrics at all:
 
 | Priority | Mechanical rule |
 |---|---|
-| P1 | The root-cause line is inside the frozen selector AND the fix fits inside files this run already opened |
-| P2 | The root-cause line is inside the frozen selector but the fix needs a file the run has not opened yet |
-| P3 | The fix crosses the selector boundary, or it does not fit the round cap of the phase that consumes this run: the fixes that phase can apply before the scope is re-frozen |
+| P1 | The root cause sits inside the frozen selector AND the fix fits inside the production file of that root cause, without a new module and without a public contract change |
+| P2 | Any other fix wholly contained in the selector: it needs another production file, a new file, or an internal contract change |
+| P3 | The fix crosses the selector boundary |
+
+Production locality is what the class measures, and four rules keep it mechanical:
+
+- **Tests do not move a class.** The tests a fix needs are declared in `where:` and never change
+  the production locality: a P1 fix whose test lands in an existing test file stays P1, and a new
+  test file on its own never turns P1 into P2.
+- **The direction has to prove P1.** When `Refactor direction` does not show that the fix fits
+  inside the production file of the root cause, the candidate takes the conservative P2.
+- **A missing fact adds no row.** A fact that lives outside the selector's radius keeps the gate
+  row that already governs it, N9, named as N9: the class is never invented on a fact this run
+  cannot see.
+- **Every finding records its basis.** Each finding carries `Priority basis:` with exactly one of
+  `root-file` (P1), `multi-file-in-selector` (P2) or `crosses-selector` (P3).
 
 Part two orders candidates inside their class, without a cut and without a percentile:
 
@@ -321,8 +335,10 @@ Part two orders candidates inside their class, without a cut and without a perce
 10. Assign P1/P2/P3 by the Priority assignment table of the run's mode, then emit the output
     template verbatim.
     Verify: every finding has a category ID, at least 1 file:line inside the frozen scope, a
-    measure, a gate note, and a one-line direction; `Coverage` names every file or hunk in scope
-    not read in full, except files listed under `Out of language scope`.
+    measure, a gate note, and a one-line direction; in area mode every finding also carries a
+    `Priority basis` of `root-file`, `multi-file-in-selector` or `crosses-selector`, agreeing with
+    the class its row assigned; `Coverage` names every file or hunk in scope not read in full,
+    except files listed under `Out of language scope`.
 ```
 
 Read `references/examples.md` before the first run: a snippet plus the filled block for A1 to A4,
@@ -347,6 +363,7 @@ one candidate filtered by the gate, and one candidate filtered by N9.
 - Evidence: `file:line`, `file:line` (<measure, e.g. "2 occurrences, identical modulo type">[; count: `<search command>` -> <n> hits])
 - Anchored in scope: `file:line` (<added or modified hunk | symbol the change touched | line inside the selector>)
 - Gate: passes; closest row N<k> doesn't apply because <deciding fact>
+- Priority basis: <root-file | multi-file-in-selector | crosses-selector> (area mode, always; delete this line in diff mode)
 - Refactor direction: <one line naming the target shape> (direction only, never the how)
 
 #### [RF-2] ...
@@ -365,18 +382,19 @@ one candidate filtered by the gate, and one candidate filtered by N9.
 ```
 
 The first two Scope lines are exclusive: emit `Diff: ... | Base: ...` in diff mode or `Area: ...
-| Targets: ... | Manifest: ...` in area mode, never both, and delete the other. Emit the rest of
-the template verbatim; the `Out of contract` line appears only when Boundaries applies. One
-bullet per finding field. If there are no findings, still emit `### Findings` with `- (none)` and
-the Summary line. An empty scope is a valid result: emit the template with `Files in scope: 0` and
-`- (none)` in every list. List every file or hunk in scope not read in full (size, truncation,
-tool error) in `Coverage: partial`, except files listed under `Out of language scope`; [NEVER]
-write `Coverage: complete` unless every hunk in scope outside those files was read. [NEVER] let a
-limitation admitted anywhere in the report coexist with a firm verdict on the same candidate;
-route that candidate per the N9 row instead. [NEVER] add sections beyond this template: no
-implementation plans, no step-by-step refactor instructions, no apply-or-not recommendations, no
-risk or safety assessments, no merge verdicts, no reachability claims about other services, even
-when the caller's prompt explicitly asks for them.
+| Targets: ... | Manifest: ...` in area mode, never both, and delete the other. The `Priority
+basis` line belongs to area mode and is deleted in diff mode, which keeps the three values out of
+a mode whose anchor is not a selector. Emit the rest of the template verbatim; the `Out of
+contract` line appears only when Boundaries applies. One bullet per finding field. If there are no
+findings, still emit `### Findings` with `- (none)` and the Summary line. An empty scope is a valid
+result: emit the template with `Files in scope: 0` and `- (none)` in every list. List every file
+or hunk in scope not read in full (size, truncation, tool error) in `Coverage: partial`, except
+files listed under `Out of language scope`; [NEVER] write `Coverage: complete` unless every hunk in
+scope outside those files was read. [NEVER] let a limitation admitted anywhere in the report
+coexist with a firm verdict on the same candidate; route that candidate per the N9 row instead.
+[NEVER] add sections beyond this template: no implementation plans, no step-by-step refactor
+instructions, no apply-or-not recommendations, no risk or safety assessments, no merge verdicts, no
+reachability claims about other services, even when the caller's prompt explicitly asks for them.
 
 When the scope cannot be frozen, emit the Blocked form and nothing else:
 

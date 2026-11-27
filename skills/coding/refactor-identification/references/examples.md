@@ -251,10 +251,16 @@ export class QuoteStore {
 ```
 
 `Quote.total` is a field the type could read off the two fields it already holds, so it is A3
-"Redundant derived field" and its fix fits the file the run already opened: P1. `QuoteStore` mixes
-bookkeeping with an unrelated audit collaborator, which is A1 "SRP violation in a class in scope",
-and moving the audit call out needs a file this run has not opened: P2. Different classes decide
-before activity and debt are consulted, so the order of the two findings is the class order.
+"Redundant derived field". Its root cause is inside the selector and deriving the total at the
+point of use stays in `src/pricing/quote.ts`, with no new module and no public contract change:
+P1, basis `root-file`. `QuoteStore` mixes bookkeeping with an unrelated audit collaborator, which
+is A1 "SRP violation in a class in scope". Its root cause is inside the selector as well, but the
+fix leaves the root cause's own file: the store drops the collaborator and its constructor changes
+shape, an internal contract, and the audit call lands where the store is constructed, another
+production file inside the module. That is P2, basis `multi-file-in-selector`; a fix whose call
+site sat outside the module would cross the selector and be P3, basis `crosses-selector`.
+Different classes decide before activity and debt are consulted, so the order of the two findings
+is the class order.
 
 ```markdown
 ## Refactor Candidates: src/pricing
@@ -271,12 +277,14 @@ before activity and debt are consulted, so the order of the two findings is the 
 - Evidence: `src/pricing/quote.ts:11` (`total` is `subtotal * (1 + taxRate)`, both fields already on the same object)
 - Anchored in scope: `src/pricing/quote.ts:11` (line inside the selector)
 - Gate: passes; closest row N7 doesn't apply because the value crosses the constructor boundary and is read by other modules
+- Priority basis: root-file
 - Refactor direction: derive the total at the point of use instead of storing it (direction only, never the how)
 
 #### [RF-2] A1 SRP violation in a class in scope: P2
 - Evidence: `src/pricing/quote-store.ts:5`, `src/pricing/quote-store.ts:15` (bookkeeping and an audit trail are two axes of change in one class)
 - Anchored in scope: `src/pricing/quote-store.ts:15` (line inside the selector)
 - Gate: passes; closest row N3 doesn't apply because the extraction is one collaborator call, not a new indirection over the whole class
+- Priority basis: multi-file-in-selector
 - Refactor direction: let the caller record the audit event, so the store keeps only its collection (direction only, never the how)
 
 ### Unresolved (needs out-of-scope evidence)

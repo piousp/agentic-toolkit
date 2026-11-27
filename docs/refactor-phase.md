@@ -31,13 +31,13 @@ The server measures and previews; it never writes.
 
 | State | What happens | Evidence it leaves | Who |
 |---|---|---|---|
-| `P0` freeze | the scope is fixed once and sealed: the diff text, or the sha256 manifest; `tree_clean` and `base_ref` are recorded here and never later | sealed selector, its digest, `tree_clean`, `base_ref` | coordinator |
+| `P0` freeze | the scope is fixed once and sealed: the diff text, or the sha256 manifest; `tree_clean` and `base_ref` are recorded here and never later; `conventions` is produced here too, its four facts each with evidence, from the reading this state authorizes | sealed selector, its digest, `tree_clean`, `base_ref`, `conventions` | coordinator |
 | `P1` detection | the four categories and their thresholds run over the frozen scope only | `RF-n` rows: category, evidence, measure, gate note, priority | detection |
 | `P2` selection | a person chooses which `RF-n` rows this run dispatches | `candidates:` for the dispatch | human |
-| `P3` plan | one disposition per candidate, steps in dependency order, one test line and one `verify:` per step, seams proposed | PLAN / TECHNICAL | planner |
+| `P3` plan | one disposition per candidate, steps in dependency order, one test line and one `verify:` per step, seams proposed; `conventions` arrives already produced and sealed, and is consumed as given, never inferred and never completed | PLAN / TECHNICAL | planner |
 | `P4` approval | a person approves the plan; the approval counts as the confirmation of every seam and of every step carrying `approval: human` | approved plan, one dispatch per step | human |
 | `P5` execution | one step per run with `mode: refactor`, evidence persisted; a step of judgment does not run before `P4` | changed files, the step's `verify:` result | executor |
-| `P6` gate | the manifest is remeasured and compared with the frozen one; suite, `verify:`s and digests are read | green, or red attributed to the phase or to the environment | coordinator |
+| `P6` gate | the manifest is remeasured and compared with the frozen one; the full suite is the command `conventions.full_suite_command` names, and the `verify:`s and digests are read | green, or red attributed to the phase or to the environment | coordinator |
 | `P7` closing | the receipt is written: the run closes, or round 2 opens | receipt with `verdict` and `round` | coordinator |
 
 No run reaches `P5` with a seam that only the plan proposed. `P4` is where seams
@@ -57,6 +57,34 @@ stop being proposals, and it is a human decision, not a step.
 - A file that changes after the freeze makes a different scope. The gate says so
   and never re-reads the file as though it were still the same run.
 
+## The conventions object
+
+`conventions` is produced at `P0`, sealed with the freeze, and consumed at `P3`.
+It is not remembered by the coordinator nor derived by the planner. It carries
+four facts, and no value travels without its evidence:
+
+| Field | Content | Evidence |
+|---|---|---|
+| `test_framework` | the test framework and the reusable test class a step extends | `path:line` |
+| `test_layout_naming` | where tests live and how they are named | `path:line` |
+| `source_layout_naming` | where production modules live and how they are named | `path:line` |
+| `full_suite_command` | a reproducible command that runs the whole suite, or `none` | `path:line` |
+
+- A fact the repository does not have is declared `none` with the evidence that
+  shows it is absent. No value is invented to fill a row.
+- `full_suite_command: none` carries its justification in the same field, so the
+  gate reads a declaration instead of a run that never happened.
+- Reading authorized for this purpose and for nothing else: to assemble
+  `conventions`, `P0` may read the manifests and the tests outside the anchor.
+  Those reads originate no `RF-n` and do not widen the detection radius; the
+  frozen scope still decides where a finding lands, and no other read is excused
+  from it.
+- A missing field, or a missing one of the four facts, is `BLOCKED` naming that
+  fact. Sources present but incompatible with each other, two equally valid test
+  conventions for instance, are one `Q<n>` with the conservative recommendation
+  marked `[ASSUMED]`. These are the only two outcomes of an incomplete or a
+  contradictory `conventions`.
+
 ## The two modes
 
 | Mode | Selector | Anchor | What closing adds |
@@ -69,8 +97,9 @@ cannot both be the place a finding lands. A dispatch carries exactly one branch,
 and both branches in the same dispatch is the exclusion violated rather than a
 preference to resolve, so the run is `BLOCKED`. The mode changes the anchor
 (hunks against a manifest), the priority cascade (a branch-added root cause
-against fix size inside the selector) and what closing requires (fitting the
-diff against a complete follow-up list).
+against where the fix is produced inside the selector: the root cause's own
+file, another file of the selector, or a fix that crosses it) and what closing
+requires (fitting the diff against a complete follow-up list).
 
 ## The receipt
 
@@ -86,6 +115,7 @@ and never in the target repository:
   "frozen_manifest_digest": "<sha256 of the manifest at freeze>",
   "tree_clean": "<true|false>",
   "base_ref": "<ref|absent>",
+  "conventions": {"test_framework": "<value> at <path:line>", "test_layout_naming": "<value> at <path:line>", "source_layout_naming": "<value> at <path:line>", "full_suite_command": "<command> at <path:line>|none, justification"},
   "measures": [{"path": "<path>", "sha256": "<digest>", "loc": "<n>", "command": "<verbatim>"}],
   "preview_digest": "<digest of the previewed change>",
   "applied_digest": "<digest of the applied change>",
@@ -102,7 +132,10 @@ and never in the target repository:
 ```
 
 `measures[]` holds the manifest as remeasured, each entry with the command that
-produced it. `ruleset` names the transformation ruleset the preview read, by the
+produced it. `conventions` is the object `P0` produced, recorded whole with the
+four facts, the value of each and its evidence, so the gate can name the full
+suite it ran and an audit can read the plan against the facts it consumed.
+`ruleset` names the transformation ruleset the preview read, by the
 first twelve characters of its digest, so a run that changed the rules is a
 different run. `steps[]` holds each step's `verify:` text
 and the command that showed it, so the gate can be repeated from the receipt.
@@ -114,7 +147,7 @@ and the command that showed it, so the gate can be repeated from the receipt.
 | common | the remeasured manifest equals the frozen one, except for the paths declared in the `files` of the steps | `measures[]` against `frozen_manifest_digest` |
 | common | `identity` is `true` | `preview_digest`, `applied_digest` |
 | common | every `verify:` is present and green, with its command verbatim | `steps[]` |
-| common | the full suite shows no regression per touched file and no new failure outside the pre-existing ones | `checks` |
+| common | the full suite shows no regression per touched file and no new failure outside the pre-existing ones; that suite is `conventions.full_suite_command`, run once at the gate | `checks`, `conventions.full_suite_command` |
 | common | nothing changed outside the declared paths | the remeasured manifest and the run's diff |
 | common | `tests_added[]` carries a `lifecycle` for every entry | `tests_added[]` |
 | `diff` only | the change fits inside the frozen diff or inside the paths the steps declared | the frozen diff and the declared paths, against the applied change |
@@ -134,6 +167,11 @@ How the gate is read:
 - Red attributed to the environment (an install, the runner, the machine, a
   pre-existing failure count that moved) opens no round: the phase is blocked,
   and the reason is written in the receipt. `checks` carries it in words.
+- The full suite is the one `conventions.full_suite_command` names, and the
+  affected suite of a single step is not it: green over a step's suite proves
+  the step, never the run. When the field is `none` with its justification, the
+  receipt carries the declaration, and the gate claims no green for a suite
+  nobody ran.
 
 ## Rounds
 

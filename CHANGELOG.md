@@ -29,6 +29,11 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `docs/roadmap.md`: the refactor phase named as the first supervised procedure of phase 8.
 - `agents/coding/refactor-planner/AGENT.md`: a step declares every path it touches, the test file included, because the gate reads the declared paths and nothing else.
 - `docs/refactor-phase.md`: the diff closure admits the paths the steps declared, so a step that adds a test can close.
+- `skills/coding/refactor-identification/SKILL.md`: the area class comes from where the fix is produced, not from the files the run already opened, and every finding records its basis.
+- `skills/coding/refactor-identification/references/examples.md`: the area example argues its classes from the production locality of each fix.
+- `docs/refactor-phase.md`: `conventions` is produced at `P0`, consumed sealed at `P3`, recorded in the receipt and read at the gate for the full suite it names.
+- `agents/coding/refactor-planner/AGENT.md`: the four facts `conventions` carries, and one rule for a `conventions` that is missing a fact.
+- `agents/coding/code-implementer/AGENT.md`: the test framework and the test class come from the plan, and the full suite is never inferred.
 
 ### Fixed
 

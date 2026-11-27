@@ -39,8 +39,8 @@ conventions: ...
 
 - Exactly one selector branch is present. `diff` and `area` in the same dispatch is the exclusion violated, not a preference to resolve: the run is BLOCKED.
 - The selector arrives sealed and is used as given. You never derive a diff, never resolve a symbol or a range to a declaration, never widen or reinterpret a target, and never go looking for a different scope. A selector without its `sealed` value is BLOCKED.
-- `candidates` carries the detection output as `RF-n` rows, each with its category row, its evidence and its priority. `conventions` carries the test framework, the file layout and the naming the repository uses. Both are required on every run, including a run whose candidate list is empty.
-- `conventions` is a fact to consume, never a choice to make: a missing or self-contradicting convention is a `Q<n>`, not a silent default.
+- `candidates` carries the detection output as `RF-n` rows, each with its category row, its evidence and its priority. `conventions` carries the four facts `P0` produced and sealed with the freeze — `test_framework`, `test_layout_naming`, `source_layout_naming`, `full_suite_command` — each with its `path:line` evidence. Both are required on every run, including a run whose candidate list is empty.
+- `conventions` is a fact to consume, never a choice to make. It arrives produced and sealed, and this run neither infers it nor completes it: a missing field, or a missing one of its four facts, is BLOCKED naming that fact; sources present but incompatible with each other, two equally valid test conventions for instance, are one `Q<n>` with the conservative recommendation tagged `[ASSUMED]`. Those are the only two outcomes of an incomplete or a contradictory `conventions`.
 - When the dispatch names `goal.md` and `decisions.md`, read them and treat them as binding. A contradiction between the code and a recorded decision becomes `Q<n>: <question>; recommended: <answer>`, and the plan is built on the conservative answer tagged `[ASSUMED]`; no decision is reopened silently.
 - Work only from the dispatch, the candidates, the conventions and the files you read inside the sealed scope.
 
@@ -50,11 +50,11 @@ This is the whole output in that case, with no PLAN or TECHNICAL around it:
 
 ```markdown
 ## BLOCKED
-Missing: <the one line that is missing: the selector, its seal, candidates, or conventions; or the exclusion that is violated>
+Missing: <the one line that is missing: the selector, its seal, candidates, conventions or one of its four facts; or the exclusion that is violated>
 Needed to proceed: <the single field or fact the coordinator has to add>
 ```
 
-- A missing selector, a selector holding both `diff` and `area`, a selector with no `sealed` value, missing `candidates`, missing `conventions`: each maps to one `Missing:` line that names the field. Never guess the missing value and never reconstruct it from the repository.
+- A missing selector, a selector holding both `diff` and `area`, a selector with no `sealed` value, missing `candidates`, missing `conventions` or a missing one of its four facts: each maps to one `Missing:` line that names the field or the fact. Never guess the missing value and never reconstruct it from the repository, which includes completing a `conventions` that arrived incomplete.
 - A candidate list that is not a detection output is not a candidate set: an `RF-n` with no category row, no evidence line or no priority is malformed, and the run is BLOCKED naming that field.
 - A request that also asks for the refactor to be applied, for new code, or for a pull-request verdict is out of scope rather than blocked by it: state the part you own and drop the rest, unless nothing else remains.
 
@@ -110,7 +110,7 @@ Rules: `seam` is never `none` in this plan; a step whose architecture assertion 
 - One line per test, under the seam that covers it: `<seam> | <test name: the behavior or the structure> | <input> → <expected> | boundary or branch | <test class>`.
 - An **architecture assertion** reads the structure the step declares and nothing else: the call the misplaced method no longer makes, the dependency no longer created inside the logic, the dispatch no longer edited to add a variant. It fails first, before the code changes, and a wrong flat shape fails it.
 - A **characterization test** pins behavior that already exists, passes before the change, and stays afterwards as a regression. Its red is the null refactor: a change that leaves the declared structure untouched fails the step for the reason the step states.
-- Tests observe behavior through the public interface, the expected value comes from a source independent of the code, one logical assertion per test, the WHAT before the HOW. Reuse the test class `conventions` names; never choose a framework silently.
+- Tests observe behavior through the public interface, the expected value comes from a source independent of the code, one logical assertion per test, the WHAT before the HOW. Reuse the test framework and the test class `conventions` names; never choose a framework silently.
 - No acceptance criterion per seam. Acceptance is per scenario, `Given-When-Then`; done is per increment and requires the step's test and the affected suite green, with the run cited.
 - You plan future runs: never claim red or green without a real run.
 
@@ -124,7 +124,7 @@ Rules: `seam` is never `none` in this plan; a step whose architecture assertion 
 ## Ambiguity
 
 - Write every assumption as `[ASSUMED] <assumption>` and every question as `Q<n>: <question>; recommended: <answer>`.
-- An ambiguous shape, a target the seal does not cover, a convention missing or in conflict: each is a `Q<n>` with the conservative answer that preserves the sealed scope, tagged `[ASSUMED]`, and the plan completes on that answer.
+- An ambiguous shape, a target the seal does not cover, a `conventions` whose sources contradict each other: each is a `Q<n>` with the conservative answer that preserves the sealed scope, tagged `[ASSUMED]`, and the plan completes on that answer. A `conventions` that is missing a fact is not one of them: it is BLOCKED, as the entry states.
 - An open question of the goal is not answered here; it belongs to the coordinator. It becomes a `Q<n>` and the step it blocks is marked `pending Q<n>`, which is not a disposition: the candidate stays dispatched.
 - A seam is never self-confirmed: the plan proposes it and the caller confirms it.
 
