@@ -9,6 +9,7 @@ import { promisify } from "node:util";
 
 import { createGit } from "../src/git.ts";
 import type { Git } from "../src/git.ts";
+import { runMeasure } from "../src/measure.ts";
 import { resolveAreaScope, resolveDiffScope } from "../src/scope.ts";
 import { openWorkspace } from "../src/workspace.ts";
 import type { WorkspaceError } from "../src/workspace.ts";
@@ -310,6 +311,66 @@ it("refuses an area request that also carries a diff base", async (t) => {
         workspace,
       ),
     { code: "SCOPE_DOUBLE" },
+  );
+});
+
+// R2/D10: the diff lists every path the working tree changed, and only the paths in
+// the measured languages are files this server can read. A path outside them leaves
+// the measured set, so the files beside it are still measured and the run keeps its
+// answer instead of aborting on the first file it cannot read.
+it("still measures the changed TypeScript files when the diff also lists a file it cannot measure", async (t) => {
+  const root = await makeRoot(t, {
+    "src/a.ts": "export const a = 1;\n",
+    "notes.md": "# notes\n",
+  });
+  const head = await commitAll(root);
+  await writeFile(path.join(root, "src/a.ts"), "export const a = 2;\n", "utf8");
+  await writeFile(path.join(root, "src/fresh.ts"), "export const fresh = 1;\n", "utf8");
+  await writeFile(path.join(root, "notes.md"), "# notes, edited\n", "utf8");
+  await writeFile(path.join(root, "data.json"), '{"untracked":true}\n', "utf8");
+  const git = createGit(await openWorkspace(root));
+
+  const scope = await resolveDiffScope({ scope: { mode: "diff", base: "HEAD" } }, git);
+
+  assert.equal(scope.base_commit, head);
+  assert.deepEqual(scope.files, ["src/a.ts", "src/fresh.ts"]);
+});
+
+// R2/D10: a changed path outside the measured languages is named instead of dropped in
+// silence. It travels in `skipped` with a reason of its own, which is what feeds the
+// caller's "Out of language scope" list, and the run answers instead of ending on it.
+it("names a changed file outside the measured languages in skipped instead of failing the run", async (t) => {
+  const root = await makeRoot(t, {
+    "src/ticket.ts": "export const ticket = 1;\n",
+    "notes.md": "# notes\n",
+  });
+  const head = await commitAll(root);
+  await writeFile(path.join(root, "src/ticket.ts"), "export const ticket = 2;\n", "utf8");
+  await writeFile(path.join(root, "notes.md"), "# notes, edited\n", "utf8");
+  await writeFile(path.join(root, "data.json"), '{"untracked":true}\n', "utf8");
+  const workspace = await openWorkspace(root);
+
+  const scope = await resolveDiffScope(
+    { scope: { mode: "diff", base: "HEAD" } },
+    createGit(workspace),
+  );
+
+  assert.equal(scope.base_commit, head);
+  assert.deepEqual(scope.skipped, [
+    { path: "data.json", reason: "out_of_language_scope" },
+    { path: "notes.md", reason: "out_of_language_scope" },
+  ]);
+
+  // The defect itself: the service reads every path the scope resolved, so a path
+  // outside the measured languages ended the whole run with LANGUAGE_UNSUPPORTED.
+  const answer = await runMeasure(
+    { scope: { mode: "diff", base: "HEAD" } },
+    { workspace, git: createGit(workspace) },
+  );
+  assert.deepEqual(answer.scope.skipped, scope.skipped);
+  assert.deepEqual(
+    answer.files.map((file) => file.path),
+    ["src/ticket.ts"],
   );
 });
 

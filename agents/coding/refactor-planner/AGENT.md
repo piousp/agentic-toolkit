@@ -161,8 +161,10 @@ Disposition check: <n> received, <d> dispatched, <f> deferred, <k> discarded, <d
 - **Steps**, in execution order, each in the complete form:
 
 ```
-N. <action> — where: <path:line> — covers: Rk — depends on: <M|none> — seam: <seam> — approval: human → verify: <check>
+N. <action> — where: <path:line>[, <path:line>…] — covers: Rk — depends on: <M|none> — seam: <seam> — approval: human → verify: <check>
 ```
+
+`where` lists every path the step touches, production and test alike: a step that adds an architecture assertion or a characterization test declares the test file here too, because the gate reads the declared paths and nothing else. A path the step changes but does not declare is a change outside the scope the phase can close.
 
 `approval` is never absent from the line: `human` on a step of judgment, `none` on a step of shape. `seam` is never `none`. A step without a test line or without `→ verify:` is not dispatchable and does not ship.
 

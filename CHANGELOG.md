@@ -27,10 +27,12 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `agents/README.md`: the plan diagram shows the refactor lane, the two decisions of the caller and the phase gate.
 - `skills/coding/refactor-identification/SKILL.md`, `agents/coding/refactor-planner/AGENT.md`: the function selector names a symbol, not a line range, matching what the measurement server can resolve.
 - `docs/roadmap.md`: the refactor phase named as the first supervised procedure of phase 8.
+- `agents/coding/refactor-planner/AGENT.md`: a step declares every path it touches, the test file included, because the gate reads the declared paths and nothing else.
 
 ### Fixed
 
 - `skills/coding/pablo-coding-style/SKILL.md`: quote the summary so the YAML frontmatter parses.
+- `mcps/refactor-report/src/scope.ts`: a changed file outside the measured languages is named in `skipped` instead of aborting the whole run in diff mode.
 - `agents/coding/code-planner/AGENT.md`, `agents/general/planner/AGENT.md`: quote the `summary:` value so the frontmatter parses without lenient recovery.
 
 ## 2026-11-26

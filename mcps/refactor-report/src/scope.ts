@@ -5,7 +5,13 @@ import type { Workspace } from "./workspace.ts";
 import { WorkspaceError } from "./workspace.ts";
 import { isMeasurablePath } from "./workspace.ts";
 
-export type SkippedFile = { readonly path: string; readonly reason: "deleted" };
+// D10: `skipped` is the set the diff named and this server does not measure, and the
+// reason says which of the two: a deleted path has nothing left to read, and a path
+// outside the measured languages is a file that exists and is not this server's to
+// read.
+export type SkippedReason = "deleted" | "out_of_language_scope";
+
+export type SkippedFile = { readonly path: string; readonly reason: SkippedReason };
 
 export type ResolvedDiffScope = {
   readonly mode: "diff";
@@ -155,10 +161,17 @@ export async function resolveDiffScope(
   const resolved = [...new Set([...changed, ...untracked])]
     .filter((file) => !gone.has(file))
     .sort();
-  const files = restrictToRequested(resolved, requested);
-  const skipped: SkippedFile[] = [...gone]
-    .sort()
-    .map((file) => ({ path: file, reason: "deleted" }));
+  // R7/D10: the diff lists every path the working tree changed, and the measured set
+  // holds only the paths in the measured languages: a path outside them is named
+  // below instead of aborting the run on the first file the reader refuses.
+  const measurable = resolved.filter((file) => isMeasurablePath(file));
+  const files = restrictToRequested(measurable, requested);
+  const skipped: SkippedFile[] = [
+    ...[...gone].map((file): SkippedFile => ({ path: file, reason: "deleted" })),
+    ...resolved
+      .filter((file) => !isMeasurablePath(file))
+      .map((file): SkippedFile => ({ path: file, reason: "out_of_language_scope" })),
+  ].sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0));
   return { mode: "diff", base, base_commit: baseCommit, files, skipped };
 }
 
