@@ -100,20 +100,26 @@ function scopeSummary(scope: ResolvedScope): MeasureScopeSummary {
 }
 
 // The evidence surface is the CLI grammar the package publishes: the selector form
-// of the same scope, and the file the number belongs to where the grammar can name
-// one.
-function scopeArguments(scope: ResolvedScope): string[] {
-  if (scope.mode !== "area") {
-    return ["--diff", scope.base];
+// of the same scope, plus the file the number belongs to, so the command answers one
+// file entry and the value it carries is the number that travelled with it. The area
+// mode names the file as a module selector because the grammar gives the diff branch
+// the only `--path`; the per-file numbers are the same in both granularities.
+function scopeArguments(scope: ResolvedScope, filePath: string): string[] {
+  if (scope.mode === "diff") {
+    return ["--diff", scope.base, "--path", filePath];
   }
-  const area = scope.area;
-  if (area.kind === "function" || area.kind === "class") {
-    return ["--area", `${area.kind}:${area.path}#${area.symbol}`];
+  return ["--area", `module:${filePath}`];
+}
+
+// A command a caller pastes into a shell, so a token that carries a blank or a quote
+// travels quoted; the rest stays as spelled, which keeps the common command readable.
+const BARE_ARGUMENT = /^[A-Za-z0-9_@%+=:,./#-]+$/;
+
+function quoteArgument(argument: string): string {
+  if (BARE_ARGUMENT.test(argument)) {
+    return argument;
   }
-  if (area.kind === "module") {
-    return ["--area", `module:${area.path}`];
-  }
-  return ["--area", "repository"];
+  return `'${argument.replaceAll("'", "'\\''")}'`;
 }
 
 // D9/R3: the digest is the sha256 of the bytes the file holds on disk, not of a
@@ -145,13 +151,10 @@ function evidenceFor(
   filePath: string,
   selected: readonly MeasureMetric[],
 ): MeasureEvidence {
-  const argv = ["node", "dist", "cli.js", "measure", ...scopeArguments(scope)];
-  if (scope.mode === "diff") {
-    argv.push("--path", filePath);
-  }
+  const argv = ["node", "dist/cli.js", "measure", ...scopeArguments(scope, filePath)];
   const evidence: Partial<Record<MeasureMetric, MeasureEvidenceEntry>> = {};
   for (const metric of selected) {
-    evidence[metric] = { command: [...argv, "--select", metric].join(" ") };
+    evidence[metric] = { command: [...argv, "--select", metric].map(quoteArgument).join(" ") };
   }
   return evidence;
 }

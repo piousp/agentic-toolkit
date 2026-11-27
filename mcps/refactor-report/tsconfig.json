@@ -21,6 +21,7 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts",
-    "test-protocol/**/*.ts"
+    "test-protocol/**/*.ts",
+    "test-cli/**/*.ts"
   ]
 }

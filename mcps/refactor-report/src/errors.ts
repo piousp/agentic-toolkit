@@ -28,10 +28,17 @@ export type TextContent = { type: "text"; text: string };
 
 export type ToolErrorResult = { isError: true; content: TextContent[] };
 
-export function errorResult(error: ToolError): ToolErrorResult {
+// The body both surfaces print: the tool wraps it in a text content block and the
+// CLI writes the same JSON, so a caller reads one shape whether the failure came
+// from the wire or from the command line (D8).
+export function errorBody(error: ToolError): string {
   const body =
     error.paths === undefined
       ? { error: { code: error.code, detail: error.detail } }
       : { error: { code: error.code, detail: error.detail, paths: error.paths } };
-  return { isError: true, content: [{ type: "text", text: JSON.stringify(body) }] };
+  return JSON.stringify(body);
+}
+
+export function errorResult(error: ToolError): ToolErrorResult {
+  return { isError: true, content: [{ type: "text", text: errorBody(error) }] };
 }
