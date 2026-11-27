@@ -61,7 +61,7 @@ stop being proposals, and it is a human decision, not a step.
 
 | Mode | Selector | Anchor | What closing adds |
 |---|---|---|---|
-| `diff` | the diff the caller hands over, or the branch's own diff, sealed by the sha256 of the diff text | the changed hunks | the change fits inside the frozen diff; `base_ref` only with `tree_clean` |
+| `diff` | the diff the caller hands over, or the branch's own diff, sealed by the sha256 of the diff text | the changed hunks | the change fits inside the frozen diff or inside the paths the steps declared; `base_ref` only with `tree_clean` |
 | `area` | one granularity, function, class, module or repository, with every symbol resolved to exactly one declaration | the sha256 manifest of every file under the selector | `followups[]` lists every candidate not dispatched as `P3` with its reason; closing with follow-ups is a valid close |
 
 The modes are exclusive because a run has one anchor: a hunk and a declared area
@@ -117,7 +117,7 @@ and the command that showed it, so the gate can be repeated from the receipt.
 | common | the full suite shows no regression per touched file and no new failure outside the pre-existing ones | `checks` |
 | common | nothing changed outside the declared paths | the remeasured manifest and the run's diff |
 | common | `tests_added[]` carries a `lifecycle` for every entry | `tests_added[]` |
-| `diff` only | the change fits inside the frozen diff | the frozen diff against the applied change |
+| `diff` only | the change fits inside the frozen diff or inside the paths the steps declared | the frozen diff and the declared paths, against the applied change |
 | `diff` only | `base_ref` is present only when `tree_clean` | `tree_clean`, `base_ref` |
 | `area` only | `followups[]` enumerates every candidate not dispatched as `P3`, with its reason | `followups[]` |
 

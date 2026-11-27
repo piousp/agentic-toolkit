@@ -28,6 +28,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `skills/coding/refactor-identification/SKILL.md`, `agents/coding/refactor-planner/AGENT.md`: the function selector names a symbol, not a line range, matching what the measurement server can resolve.
 - `docs/roadmap.md`: the refactor phase named as the first supervised procedure of phase 8.
 - `agents/coding/refactor-planner/AGENT.md`: a step declares every path it touches, the test file included, because the gate reads the declared paths and nothing else.
+- `docs/refactor-phase.md`: the diff closure admits the paths the steps declared, so a step that adds a test can close.
 
 ### Fixed
 
