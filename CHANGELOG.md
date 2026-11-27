@@ -22,6 +22,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 ### Fixed
 
 - `skills/coding/pablo-coding-style/SKILL.md`: quote the summary so the YAML frontmatter parses.
+- `agents/coding/code-planner/AGENT.md`, `agents/general/planner/AGENT.md`: quote the `summary:` value so the frontmatter parses without lenient recovery.
 
 ## 2026-11-26
 

@@ -6,7 +6,7 @@ description: >
   BLOCKED when no plan can be produced. Routes any objective whose deliverable
   is a change to files in a repository to the code planner (code-planner).
   Accepts an optional external lens. Never implements or changes state.
-summary: Plans non-code work: tasks, projects, research, documents, writing.
+summary: "Plans non-code work: tasks, projects, research, documents, writing."
 tools: read, grep, find, ls, bash, subagent
 timeoutMs: 1800000
 systemPromptMode: replace
