@@ -18,6 +18,7 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `scripts/gen_index.py`: the index tables show each artifact's `summary:`, falling back to the first sentence of `description`.
 - `scripts/check_repo.py`, `tests/run_tests.sh`: fail on a `summary` longer than an index row.
 - `AGENTS.md`, `docs/conventions.md`: `summary` documented as the human-facing line beside the routing description.
+- `skills/coding/refactor-identification/SKILL.md`, `skills/coding/refactor-identification/references/typescript.md`, `skills/coding/refactor-identification/references/examples.md`: cells neutral to the entry mode, a grouping imposed from outside excluded from the clump row, and an area-mode example.
 
 ### Fixed
 

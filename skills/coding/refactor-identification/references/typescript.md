@@ -8,14 +8,14 @@ hit without the shape the row describes is not evidence: read the surrounding co
 
 | Cue | Grep or read | Feeds row |
 |---|---|---|
-| Duplicate pipeline shape | `grep -n "\.map(\|\.filter(\|\.reduce(\|\.flatMap("` in the touched file; compare chains across functions: same operator order and same callback body, only the element type, field or literal differs | Structural duplication (same algorithm, different type) |
+| Duplicate pipeline shape | `grep -n "\.map(\|\.filter(\|\.reduce(\|\.flatMap("` inside each file the scope opened; compare chains across functions: same operator order and same callback body, only the element type, field or literal differs | Structural duplication (same algorithm, different type) |
 | Duplicate function modulo its type parameter | Two functions, classes or interfaces identical except for the type parameter or element type; a single generic signature covers both | Structural duplication (same algorithm, different type) |
 | Overload set with a duplicated body | Overload declarations whose one implementation repeats the same branch once per signature | Structural duplication (same algorithm, different type) |
 | Duplicate async orchestration | Two functions with the same `await` / `try` / retry / `Promise.all` sequence, only the called API differs | Structural duplication (same algorithm, different type) |
 | Re-implemented helper | A local arrow function, predicate or constant whose body matches one already exported from a file the scope opened only at the public-signature level (`grep -n "export function\|export const"` on that file) | Inline re-implementation of an existing helper |
 | Duplicate predicate | The same domain condition in an `if`, a ternary or a `.filter` callback across files: same field names, same literals | Business-rule duplication |
-| Second unrelated axis in a touched class | `git diff` on the import block: a new `import` from a folder unrelated to the module's domain; or `implements A, B` where the branch adds `B` and `B`'s members share no field with `A`'s | SRP violation in a class in scope |
-| Added branch in an existing chain | `grep -n "case \|else if"` inside a chain the diff touches; count the branches after the change | OCP violation (dispatch modified, not extended) |
+| Second unrelated axis in a class in scope | Read the import block: an `import` from a folder unrelated to the module's domain; or `implements A, B` where `B`'s members share no field with `A`'s | SRP violation in a class in scope |
+| Branch in an existing chain | `grep -n "case \|else if"` inside a chain in scope; count its branches and read whether one more variant would be another case here | OCP violation (dispatch modified, not extended) |
 | Feature envy | Inside one method, count property reads and calls on one foreign object (`order.total`, `order.getTotal()`) against `this.` or the function's own parameters | Misplaced logic (feature envy) |
 | Inheritance for reuse | `grep -n "extends "`; a subclass that overrides only to call `super.m()` and no-op, or that overrides nothing at all | Inheritance used for reuse, not variation |
 | Mixed-phase function | One body that parses or validates raw input and then computes a result from those locals, with no named intermediate object between the halves | Mixed-phase function (no split phase) |
@@ -39,7 +39,7 @@ hit without the shape the row describes is not evidence: read the surrounding co
 
 | Cue | Grep or read | Feeds row |
 |---|---|---|
-| Primitive carrying a domain concept | A `string`/`number`/`boolean` parameter or field meaning an id, code, currency, email or status across the touched signatures, or the same format checked in several places (`grep -n "\.test(\|RegExp("`); a `type Email = string` alias brands nothing | Primitive obsession |
+| Primitive carrying a domain concept | A `string`/`number`/`boolean` parameter or field meaning an id, code, currency, email or status across the signatures in scope, or the same format checked in several places (`grep -n "\.test(\|RegExp("`); a `type Email = string` alias brands nothing | Primitive obsession |
 | Literal comparison as a branch | `grep -n "=== '\|=== \""` comparing one field against literals, or an `as const` array or a literal union declared as the allowed values of one field | Stringly-typed state |
 | Producer returning `null` on not-found | A `T \| null` or optional return on the expected-absence path, with callers narrowing through `?.`, `??` or `!` (`grep -n "?\.\|??\|!\.\|!== null"`) | null as domain absence |
 | Throw for an expected outcome | `throw new Error(...)` or a thrown subclass for an expected domain failure, with a nearby `catch` that branches on `err.message`, `err.code` or `instanceof` instead of rethrowing | Exceptions as control flow |

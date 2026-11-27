@@ -3,7 +3,8 @@
 One resolved example per category, a second one for the A3 "Redundant derived field" row, one
 candidate filtered by the gate, and one candidate filtered by N9. Each example pairs the
 before-snippet as it appears in a branch's diff with the exact block the run emits. Priorities
-are the ones the cascade of the run's mode assigns; every example here is diff mode.
+are the ones the cascade of the run's mode assigns; every example but the last is diff mode, and
+the last one runs in area mode over a declared module.
 
 ## A1: Structural duplication (same algorithm, different type)
 
@@ -144,14 +145,15 @@ export function applyDiscount(order: Order): number {
 }
 ```
 
-This looks like an A1/A4 candidate, a branching rule that "could" become a Strategy, but only one
-discount rule exists and the branch introduces no second one.
+This reads as an A1 OCP violation (dispatch modified, not extended): one more discount rule would
+arrive as another branch of this chain. The gate stops it at N1 before the question of size comes
+up, because only one rule exists and nothing in the scope shows a concrete second one.
 
 ```markdown
 ### Filtered out
-- Single-implementation branching mistaken for a Strategy candidate at
-  `src/pricing/discount-calculator.ts:9-13`, filtered by N1 (only one discount rule exists and
-  this branch adds no second implementation)
+- A1 OCP violation (dispatch modified, not extended) at
+  `src/pricing/discount-calculator.ts:9-13`, filtered by N1 (only one discount rule exists and this
+  scope shows no second implementation)
 ```
 
 ## Filtered by N9: duplicate whose other copy lives in another repository
@@ -205,3 +207,87 @@ export class Customer {
 - Gate: passes; closest row N8 doesn't apply because removing the field deletes a second source of truth rather than renaming or reformatting anything
 - Refactor direction: derive `fullName` as an accessor at the point of use instead of storing it (direction only, never the how)
 ```
+
+## Area mode: a declared module, no diff
+
+The caller declares `area: { granularity: module, targets: ["src/pricing"] }`. There is no branch
+and no base ref: the run freezes the three files under that module, takes their sha256 manifest,
+and reads nothing outside it except the public signatures one hop away.
+
+```ts
+// src/pricing/quote.ts:8
+export class Quote {
+  readonly subtotal: number;
+  readonly taxRate: number;
+  total: number;
+
+  constructor(subtotal: number, taxRate: number) {
+    this.subtotal = subtotal;
+    this.taxRate = taxRate;
+    this.total = subtotal * (1 + taxRate);
+  }
+}
+```
+
+```ts
+// src/pricing/quote-store.ts:5
+export class QuoteStore {
+  private readonly quotes: Quote[] = [];
+  private readonly audit: AuditLog;
+
+  constructor(audit: AuditLog) {
+    this.audit = audit;
+  }
+
+  add(quote: Quote): void {
+    this.quotes.push(quote);
+    this.audit.append('quote.added');
+  }
+
+  all(): readonly Quote[] {
+    return this.quotes;
+  }
+}
+```
+
+`Quote.total` is a field the type could read off the two fields it already holds, so it is A3
+"Redundant derived field" and its fix fits the file the run already opened: P1. `QuoteStore` mixes
+bookkeeping with an unrelated audit collaborator, which is A1 "SRP violation in a class in scope",
+and moving the audit call out needs a file this run has not opened: P2. Different classes decide
+before activity and debt are consulted, so the order of the two findings is the class order.
+
+```markdown
+## Refactor Candidates: src/pricing
+
+### Scope
+- Area: module src/pricing | Targets: 3 | Manifest: 9f2c1a0d4b7e6c58a3f19d02be45c7713d8a6f4e0b1c9d27a5e83f6b4c0d19a2
+- Files in scope: 3 | Context files read (1-hop): 2
+- Coverage: complete
+- Out of language scope: (none)
+
+### Findings
+
+#### [RF-1] A3 Redundant derived field: P1
+- Evidence: `src/pricing/quote.ts:11` (`total` is `subtotal * (1 + taxRate)`, both fields already on the same object)
+- Anchored in scope: `src/pricing/quote.ts:11` (line inside the selector)
+- Gate: passes; closest row N7 doesn't apply because the value crosses the constructor boundary and is read by other modules
+- Refactor direction: derive the total at the point of use instead of storing it (direction only, never the how)
+
+#### [RF-2] A1 SRP violation in a class in scope: P2
+- Evidence: `src/pricing/quote-store.ts:5`, `src/pricing/quote-store.ts:15` (bookkeeping and an audit trail are two axes of change in one class)
+- Anchored in scope: `src/pricing/quote-store.ts:15` (line inside the selector)
+- Gate: passes; closest row N3 doesn't apply because the extraction is one collaborator call, not a new indirection over the whole class
+- Refactor direction: let the caller record the audit event, so the store keeps only its collection (direction only, never the how)
+
+### Unresolved (needs out-of-scope evidence)
+- (none)
+
+### Filtered out
+- (none)
+
+### Summary: 2 candidates (1 P1, 1 P2, 0 P3), 0 unresolved, 0 filtered out
+```
+
+The digest is the sha256 of the frozen manifest, printed as the run read it; it changes whenever a
+file inside the scope changes, which is how a second round knows it is looking at a different
+scope. Activity and debt are recorded in the run's receipt, not in the report.
