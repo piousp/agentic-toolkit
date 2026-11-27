@@ -36,7 +36,7 @@ The server measures and previews; it never writes.
 | `P2` selection | a person chooses which `RF-n` rows this run dispatches, and the choice is recorded as the complete partition of the detected set: every `RF-n` is either a selected candidate or a not-selected one, and not selecting never equals discarding it nor lowering its priority | `candidates:` for the dispatch, the not-selected rows with the priority detection gave them | human |
 | `P3` plan | one disposition per candidate, steps in dependency order, one test line and one `verify:` per step, seams proposed; `conventions` arrives already produced and sealed, and is consumed as given, never inferred and never completed | PLAN / TECHNICAL | planner |
 | `P4` approval | a person approves the plan; the approval counts as the confirmation of every seam and of every step carrying `approval: human` | approved plan, one dispatch per step | human |
-| `P5` execution | one step per run with `mode: refactor`, evidence persisted; a step of judgment does not run before `P4` | changed files, the step's `verify:` result | executor |
+| `P5` execution | one step per run with `mode: refactor`, evidence persisted; a step of judgment does not run before `P4` | changed files, the step's `verify:` result, and in `mode: refactor` the structural observable the step recorded: `structure_check` and `null_refactor` | executor |
 | `P6` gate | the manifest is remeasured and compared with the frozen one; the full suite is the command `conventions.full_suite_command` names, and the `verify:`s and the optional preview evidence are read | green, or red attributed to the phase or to the environment | coordinator |
 | `P7` closing | the receipt is written: the run closes, or round 2 opens | receipt with `verdict` and `round` | coordinator |
 
@@ -169,7 +169,7 @@ and never in the target repository:
   "preview_digest": "<digest of the previewed change, or null when nothing was previewed>",
   "applied_digest": "<digest of the applied change, or null when nothing was applied>",
   "ruleset": "<file>#sha256:<12> of the transformation ruleset the preview used>",
-  "steps": [{"n": "<step>", "verify": "<verbatim verify: text>", "command": "<verbatim>", "status": "<pass|fail|blocked>"}],
+  "steps": [{"n": "<step>", "verify": "<verbatim verify: text>", "command": "<verbatim>", "status": "<pass|fail|blocked>", "structure_check": "<the deterministic command or read, and the fact it reads>|none", "null_refactor": "<true|false|null>|none"}],
   "checks": {"steps": [{"n": "<step>", "affected_suite": "<command and result per touched file>", "preexisting_failures": "<names and counts>"}], "full_suite": {"command": "<conventions.full_suite_command>", "status": "<pass|fail|not_applicable|environmental>", "result": "<counts and failing tests>", "justification": "<why it did not run, when it did not>"}},
   "tests_added": [{"path": "<path>", "kind": "<architecture|characterization>", "lifecycle": "<keep|retire|pending-decision>"}],
   "followups": [{"rf": "<RF-n>", "priority": "<as detected: P1|P2|P3>", "reason": "<human-selection|detected-P3>", "why": "<reason it was not dispatched>"}],
@@ -186,7 +186,13 @@ suite it ran and an audit can read the plan against the facts it consumed.
 `ruleset` names the transformation ruleset the preview read, by the
 first twelve characters of its digest, so a run that changed the rules is a
 different run. `steps[]` holds each step's `verify:` text
-and the command that showed it, so the gate can be repeated from the receipt.
+and the command that showed it, so the gate can be repeated from the receipt. In
+`mode: refactor` each entry also carries the two fields of the structural
+observable the executor produced: `structure_check`, the deterministic command
+or read and the fact it reads, and `null_refactor`, `true` when the structure
+after the change equals the one before, `false` when the two differ, `null` when
+there was no `structure_check` to compare. In `mode: tdd` both are registered
+`none`.
 
 `preview_match` carries the relation between the two digests and nothing else:
 `null` when one or both are missing, `true` when both exist and agree, `false`

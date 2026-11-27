@@ -108,7 +108,7 @@ Rules: `seam` is never `none` in this plan; a step whose architecture assertion 
 
 ## Test planning
 
-- Every step carries exactly one test line. A step with no test line is not dispatchable.
+- Every step carries exactly one test line. A step with no test line is not dispatchable. A step of judgment whose only test is a characterization test is dispatchable only with a `structure_check` declared on its step line, and not without one.
 - One line per test, under the seam that covers it: `<seam> | <test name: the behavior or the structure> | <input> → <expected> | boundary or branch | <test class>`.
 - An **architecture assertion** reads the structure the step declares and nothing else: the call the misplaced method no longer makes, the dependency no longer created inside the logic, the dispatch no longer edited to add a variant. It fails first, before the code changes, and a wrong flat shape fails it.
 - A **characterization test** pins behavior that already exists, passes before the change, and stays afterwards as a regression. Its red is the null refactor: a change that leaves the declared structure untouched fails the step for the reason the step states.
@@ -163,14 +163,14 @@ Disposition check: <n> received, <d> dispatched, <f> deferred, dispatched + defe
 - **Steps**, in execution order, each in the complete form:
 
 ```
-N. <action> — where: <path:line>[, <path:line>…] — covers: Rk — depends on: <M|none> — seam: <seam> — approval: human → verify: <check>
+N. <action> — where: <path:line>[, <path:line>…] — covers: RF-n — depends on: <M|none> — seam: <seam> — approval: human — structure_check: <the deterministic command or read, and the fact it reads>|none → verify: <check>
 ```
 
 `where` lists every path the step touches, production and test alike: a step that adds an architecture assertion or a characterization test declares the test file here too, because the gate reads the declared paths and nothing else. A path the step changes but does not declare is a change outside the scope the phase can close.
 
 The set that authorizes a write is the writing set, the union of the paths of the `where:` of the steps the plan approved at `P4`, production and test alike. The anchor originates the candidates, and the radius of the one-hop read never authorizes a write by itself. In `area` mode the production the writing set holds stays inside the selector, production outside it is not dispatched, and the declared test files may sit outside the selector. In `diff` mode the writing set may hold new files, production or test, and each of them needs the human approval of `P4`.
 
-`approval` is never absent from the line: `human` on a step of judgment, `none` on a step of shape. `seam` is never `none`. A step without a test line or without `→ verify:` is not dispatchable and does not ship.
+`approval` is never absent from the line: `human` on a step of judgment, `none` on a step of shape. `seam` is never `none`. `structure_check` is never absent either: a step of judgment declares the deterministic command or read and the structural fact it reads, and a step of shape declares `none`, because its observable is the architecture assertion. `covers` names the candidate the step produces, `RF-n` as the detection output numbered it. A step without a test line or without `→ verify:` is not dispatchable and does not ship.
 
 **TECHNICAL** — how and why:
 

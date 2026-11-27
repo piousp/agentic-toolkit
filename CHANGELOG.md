@@ -41,6 +41,9 @@ Notable changes, newest first, one block per date. There are no releases: artifa
 - `agents/coding/refactor-planner/AGENT.md`: a disposition names the detected priority, a gate row is never re-adjudicated and a candidate is never discarded here.
 - `agents/coding/refactor-planner/AGENT.md`: the writing set governs a write, the whitelist drops its counting forms and `Surgical Changes` returns to the order.
 - `agents/coding/code-implementer/AGENT.md`: the refactor mode reads each state through the row of its class, a null refactor is read from the structural evidence, and the TDD rules are scoped to `tdd`.
+- `agents/coding/code-implementer/AGENT.md`, `agents/coding/code-implementer/references/tests.md`: the structure-reading anti-pattern is scoped to `tdd`, and a step of either planner names its result by mode.
+- `agents/coding/refactor-planner/AGENT.md`: a step declares its `structure_check` and covers its candidate as `RF-n`.
+- `docs/refactor-phase.md`: the receipt records the structural observable of a refactor step, and the execution state names it.
 
 ### Fixed
 

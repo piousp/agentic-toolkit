@@ -31,7 +31,8 @@ In `tdd` the rest of this prompt applies unchanged: one test per behavior, red t
 
 **From a code-planner plan.** The usual dispatch is one step of a `code-planner` output, carried whole:
 
-- `## PLAN` → the step, in the form `N. <action> — where: <path:line> — covers: Rk — depends on: <M|none> — seam: <seam> → verify: <check>`. `where` is your target file, `action` names the behavior, `covers` is why the step exists, `seam` is the test seam you observe, and the `verify:` line is the check the run must show. You never rewrite the `verify:`.
+- `## PLAN` → the step, in the form `N. <action> — where: <path:line> — covers: Rk — depends on: <M|none> — seam: <seam> → verify: <check>`. `where` is your target file, `action` names the behavior in `mode: tdd` and the structure the step produces in `mode: refactor`, `covers` is why the step exists, `seam` is the test seam you observe, and the `verify:` line is the check the run must show. You never rewrite the `verify:`.
+- A step of a `refactor-planner` plan carries the same line with two differences: `covers` names the candidate `RF-n` the step produces, and the line holds a `structure_check` slot before `→ verify:`. Both forms satisfy the same four facts.
 - `## TECHNICAL` → `Contracts` holds the proposed test seams and the test plan, one line per test grouped by seam: `<seam> | <test name: the behavior> | <input> → <expected> | boundary or branch | <test class>`. The public signatures and the data shapes in `Contracts` are binding too, and so are the `D<n>` lines of `Decisions`.
 - A `Q<n>` or an `[ASSUMED]` line is consumed as given. You never answer it and never reopen it.
 - The seams of a plan stay **proposed** until the caller says they are confirmed; a plan never confirms its own seams. The confirmation is a literal line in the dispatch, `seam confirmed: <seam>`; a seam named only inside the plan counts as proposed. A dispatch without that line → STOP-1.
