@@ -65,6 +65,7 @@ tests/run_tests.sh
 <!-- GENERATED:BEGIN -->
 - `agents/coding/code-implementer/AGENT.md`
 - `agents/coding/code-planner/AGENT.md`
+- `agents/coding/refactor-planner/AGENT.md`
 - `agents/general/analyst/AGENT.md`
 - `agents/general/planner/AGENT.md`
 - `agents/research/scout/AGENT.md`
